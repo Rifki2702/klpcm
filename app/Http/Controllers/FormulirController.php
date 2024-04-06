@@ -44,7 +44,6 @@ class FormulirController extends Controller
             return redirect()->back()->with('error', 'Formulir tidak ditemukan');
         }
 
-        // Hapus juga isi formulir yang terkait
         $formulir->isiForms()->delete();
         $formulir->delete();
 
@@ -62,11 +61,10 @@ class FormulirController extends Controller
     public function createisi($id)
     {
         $formulir = Formulir::findOrFail($id);
-        $isiForms = $formulir->isiForms; // Mendapatkan semua isi formulir terkait
+        $isiForms = $formulir->isiForms;
         return view('admin.formulir.createisi', compact('formulir', 'isiForms'));
     }
      
-       
     public function insertisi(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -104,5 +102,4 @@ class FormulirController extends Controller
 
         return redirect()->back()->with('success', 'Isi Formulir berhasil dihapus');
     }
-
 }

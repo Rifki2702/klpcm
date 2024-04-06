@@ -20,12 +20,13 @@ class CreateKelengkapanTable extends Migration
             $table->unsignedBigInteger('isi_form_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('pasien_id');
-            $table->enum('kelengkapan', ['lengkap', 'tidak lengkap']);
+            $table->enum('kualitatif', ['lengkap', 'tidak lengkap']);
+            $table->enum('kuantitatif', ['lengkap', 'tidak lengkap']);
             $table->timestamp('tglberkas')->nullable();
             $table->timestamp('tglcek')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamps();
 
-            $table->foreign('formulir_id')->references('id')->on('formulirs');
+            $table->foreign('formulir_id')->references('id')->on('formulirs')->onDelete('cascade');
             $table->foreign('isi_form_id')->references('id')->on('isi_forms');
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('pasien_id')->references('id')->on('pasiens');

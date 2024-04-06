@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Formulir;
 use Illuminate\Http\Request;
 use App\Models\Pasien;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
@@ -97,11 +100,19 @@ class RMController extends Controller
         return view('rm.analisis.analisislama', compact('rm_pasien'));
     }
 
-    public function analisisbaru($id){
+    public function analisisbaru($id)
+    {
         $pasien = Pasien::findOrFail($id);
         $rm_pasien = $pasien->rm;
-        
-        return view('rm.analisis.analisisbaru', compact('rm_pasien'));
+    
+        $usersDokter = User::whereHas('roles', function ($query) {
+            $query->where('name', 'dokter');
+        })->get();
+    
+        $formulirs = Formulir::simplePaginate(1);
+    
+        return view('rm.analisis.analisisbaru', compact('rm_pasien', 'usersDokter', 'formulirs'));
     }
-
+    
 }
+

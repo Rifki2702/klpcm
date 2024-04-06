@@ -17,4 +17,9 @@ class IsiForm extends Model
     {
         return $this->belongsTo(Formulir::class, 'formulir_id');
     }
+
+    public function kelengkapan()
+    {
+        return $this->hasOne(Kelengkapan::class);
+    }
 }

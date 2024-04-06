@@ -14,5 +14,8 @@ class Role extends Model
         return $this->hasMany(User::class);
     }
 
+    public function formulirs()
+    {
+        return $this->hasMany(Formulir::class)->where('name', 'dokter');
+    }
 }
-

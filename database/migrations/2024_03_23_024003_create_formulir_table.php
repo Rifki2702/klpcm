@@ -12,6 +12,8 @@ class CreateFormulirTable extends Migration
             $table->id();
             $table->string('nama_formulir');
             $table->timestamps();
+            $table->unsignedBigInteger('role_id');
+            $table->foreign('role_id')->references('id')->on('roles');
         });
     }
 

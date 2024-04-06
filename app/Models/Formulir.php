@@ -7,16 +7,22 @@ use App\Models\IsiForm;
 
 class Formulir extends Model
 {
-    protected $table = 'formulir'; // Nama tabel di database
+    protected $table = 'formulir';
 
     protected $fillable = [
         'nama_formulir',
     ];
 
-    // Relasi one-to-many dengan tabel isi_form
     public function isiForms()
     {
         return $this->hasMany(IsiForm::class, 'formulir_id');
-    }    
-
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+    public function kelengkapans()
+    {
+        return $this->hasMany(Kelengkapan::class);
+    }
 }

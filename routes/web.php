@@ -48,7 +48,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'] ,
     Route::post('/insertisi',[FormulirController::class,'insertisi'])->name('insertisi');
     Route::get('/deleteisi/{id}', [FormulirController::class, 'deleteisi'])->name('deleteisi');
 
-
     Route::get('/pasienmanagement',[RMController::class,'pasienmanagement'])->name('pasienmanagement');
     Route::get('/createpasien',[RMController::class,'createpasien'])->name('createpasien');
     Route::post('/insertpasien',[RMController::class,'insertpasien'])->name('insertpasien');
