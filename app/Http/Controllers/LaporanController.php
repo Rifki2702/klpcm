@@ -7,7 +7,8 @@ use App\Models\User;
 
 class LaporanController extends Controller
 {
-    public function laporanmanagement(){
+    public function laporanmanagement()
+    {
         $data = User::get();
         return view('admin.laporan.laporanmanagement', compact('data'));
     }

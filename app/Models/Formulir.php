@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\IsiForm;
 
 class Formulir extends Model
 {
@@ -17,12 +16,14 @@ class Formulir extends Model
     {
         return $this->hasMany(IsiForm::class, 'formulir_id');
     }
+
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
+
     public function kelengkapans()
     {
-        return $this->hasMany(Kelengkapan::class);
+        return $this->hasMany(Kelengkapan::class, 'formulir_id');
     }
 }

@@ -7,20 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     public function up()
-{
-    Schema::create('pasien', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->string('rm');
-        $table->date('tgl_lahir');
-        $table->string('gender');
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('pasiens', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('rm');
+            $table->date('tgl_lahir');
+            $table->string('gender');
+            $table->timestamps();
+        });
+    }
 
-public function down()
-{
-    Schema::dropIfExists('pasien');
-}
-
+    public function down()
+    {
+        Schema::dropIfExists('pasien');
+    }
 };

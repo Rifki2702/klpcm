@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kelengkapan extends Model
 {
+    protected $table = 'kelengkapan';
     public function isiForm()
     {
         return $this->belongsTo(IsiForm::class);
@@ -15,5 +16,8 @@ class Kelengkapan extends Model
     {
         return $this->belongsTo(Formulir::class);
     }
+    public function analisisKualitatif()
+    {
+        return $this->hasMany(AnalisisKualitatif::class);
+    }
 }
-

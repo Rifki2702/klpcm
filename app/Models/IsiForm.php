@@ -9,8 +9,8 @@ class IsiForm extends Model
     protected $table = 'isi_form';
 
     protected $fillable = [
-        'formulir_id', 
-        'isi', 
+        'formulir_id',
+        'isi',
     ];
 
     public function formulir()

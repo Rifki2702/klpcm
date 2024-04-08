@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 
 class DokterController extends Controller
 {
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware(['role:dokter']);
     }
 
-    public function viewklpcm(){
+    public function viewklpcm()
+    {
         $data = User::get();
         return view('dokter.viewklpcm', compact('data'));
     }

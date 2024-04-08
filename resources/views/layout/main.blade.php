@@ -161,7 +161,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.laporanmanagement') }}">
+                        <a class="nav-link" href="{{ route('admin.laporanmanagement') }}">
                             <i class="icon-bar-graph menu-icon"></i>
                             <span class="menu-title">Laporan</span>
                         </a>
@@ -200,7 +200,7 @@
 
     <!-- End plugin js for this page -->
     <!-- inject:js -->
-    <script src="{{ asset('skydash/js/off-canvas.js')}}"></script>
+    <script src="{ { asset('skydash/js/off-canvas.js')}}"></script>
     <script src="{{ asset('skydash/js/hoverable-collapse.js')}}"></script>
     <script src="{{ asset('skydash/js/template.js')}}"></script>
     <script src="{{ asset('skydash/js/settings.js')}}"></script>

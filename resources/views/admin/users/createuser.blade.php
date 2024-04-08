@@ -37,7 +37,7 @@
                         <div class="col-sm-9">
                             <select name="role_id" id="role_id" class="form-control">
                                 @foreach($roles as $role)
-                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                <option value="{{ $role->id }}">{{ $role->name }}</option>
                                 @endforeach
                             </select>
                             @error('role_id')
@@ -65,9 +65,9 @@
                                 <img id="selectedPhoto" src="#" alt="Selected Photo" style="max-width: 100%; max-height: 200px; display: none;">
                             </div>
                             <label for="exampleInputFile" id="uploadLabel" class="btn btn-outline-secondary btn-icon-text">
-                            <i class="ti-image btn-icon-prepend"></i>
-                            Upload
-                            <input type="file" name="foto" class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp" style="display: none;" onchange="displaySelectedPhoto(this)">
+                                <i class="ti-image btn-icon-prepend"></i>
+                                Upload
+                                <input type="file" name="foto" class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp" style="display: none;" onchange="displaySelectedPhoto(this)">
                             </label>
                             <button type="button" class="btn btn-danger btn-sm mt-2" id="deleteButton" onclick="resetSelectedPhoto()" style="display: none;">Hapus</button>
                         </div>

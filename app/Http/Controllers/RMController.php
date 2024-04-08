@@ -12,46 +12,51 @@ use Illuminate\Support\Facades\Storage;
 
 class RMController extends Controller
 {
-    public function __construct(){
-        $this->middleware(['role:admin|rm']);    
-    }    
+    public function __construct()
+    {
+        $this->middleware(['role:admin|rm']);
+    }
 
-    public function pasienmanagement(){
+    public function pasienmanagement()
+    {
         $data = Pasien::get();
         return view('rm.pasien.pasienmanagement', compact('data'));
     }
 
-    public function createpasien(){
+    public function createpasien()
+    {
         return view('rm.pasien.createpasien');
     }
 
-    public function insertpasien(Request $request){
+    public function insertpasien(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name'      => 'required',
             'rm'        => 'required|unique:pasiens',
             'tgl_lahir' => 'required',
             'gender'    => 'required',
         ]);
-    
-        if($validator->fails()) {
+
+        if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
         }
-    
+
         $data['name']       = $request->name;
         $data['rm']         = $request->rm;
         $data['tgl_lahir']  = $request->tgl_lahir;
         $data['gender']     = $request->gender;
-    
+
         Pasien::create($data);
-    
+
         return redirect()->route('admin.pasienmanagement');
         return redirect()->route('admin.pasienmanagement')->with('success', 'Data berhasil ditambah.');
     }
 
-    public function editpasien(Request $request,$id){
+    public function editpasien(Request $request, $id)
+    {
         $data = Pasien::find($id);
 
-        return view('rm.pasien.editpasien',compact('data'));
+        return view('rm.pasien.editpasien', compact('data'));
     }
 
     public function updatepasien(Request $request, $id)
@@ -62,41 +67,46 @@ class RMController extends Controller
             'tgl_lahir' => 'required',
             'gender'    => 'required',
         ]);
-    
+
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
         }
-    
+
         $data['name']      = $request->name;
         $data['rm']        = $request->rm;
         $data['tgl_lahir'] = $request->tgl_lahir;
         $data['gender']    = $request->gender;
-    
+
         Pasien::whereId($id)->update($data);
-    
+
         return redirect()->route('admin.pasienmanagement')->with('warning', 'Data berhasil diupdate.');
     }
-    
-    public function deletepasien(Request $request,$id){
+
+    public function deletepasien(Request $request, $id)
+    {
         $data = Pasien::find($id);
 
-        if($data){
+        if ($data) {
             $data->delete();
         }
-    
+
         return redirect()->route('admin.pasienmanagement')->with('danger', 'Data berhasil dihapus.');
     }
 
-    public function analisismanagement(){
+    public function analisismanagement()
+    {
+        $usersDokter = User::whereHas('roles', function ($query) {
+            $query->where('name', 'dokter');
+        })->get();
         $data = Pasien::get();
-        return view('rm.analisis.analisismanagement', compact('data'));
+        return view('rm.analisis.analisismanagement', compact('data', 'usersDokter'));
     }
 
-
-    public function analisislama($id){
+    public function analisislama($id)
+    {
         $pasien = Pasien::findOrFail($id);
         $rm_pasien = $pasien->rm;
-        
+
         return view('rm.analisis.analisislama', compact('rm_pasien'));
     }
 
@@ -104,15 +114,13 @@ class RMController extends Controller
     {
         $pasien = Pasien::findOrFail($id);
         $rm_pasien = $pasien->rm;
-    
+
         $usersDokter = User::whereHas('roles', function ($query) {
             $query->where('name', 'dokter');
         })->get();
-    
+
         $formulirs = Formulir::simplePaginate(1);
-    
+
         return view('rm.analisis.analisisbaru', compact('rm_pasien', 'usersDokter', 'formulirs'));
     }
-    
 }
-

@@ -38,7 +38,7 @@
                         <div class="col-sm-9">
                             <select name="role_id" id="role_id" class="form-control">
                                 @foreach($roles as $role)
-                                    <option value="{{ $role->id }}" {{ $data->roles->contains('id', $role->id) ? 'selected' : '' }}>{{ $role->name }}</option>
+                                <option value="{{ $role->id }}" {{ $data->roles->contains('id', $role->id) ? 'selected' : '' }}>{{ $role->name }}</option>
                                 @endforeach
                             </select>
                             @error('role_id')

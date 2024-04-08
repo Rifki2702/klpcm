@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware(['role:admin']);
     }
 
@@ -22,7 +23,8 @@ class AdminController extends Controller
         return view('user.index', compact('users'));
     }
 
-    public function usermanagement(){
+    public function usermanagement()
+    {
         $data = User::get();
         return view('admin.users.usermanagement', compact('data'));
     }
@@ -43,36 +45,36 @@ class AdminController extends Controller
             'password' => 'required',
             'role_id'  => 'required|exists:roles,id',
         ]);
-    
+
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
         }
-    
+
         $data['name']       = $request->name;
         $data['email']      = $request->email;
         $data['gender']     = $request->gender;
         $data['password']   = Hash::make($request->password);
-    
+
         // Cek apakah ada file foto yang diupload
         if ($request->hasFile('foto')) {
             $foto     = $request->file('foto');
             $filename = date('Y-m-d') . $foto->getClientOriginalName();
             $path     = '/foto-user/' . $filename;
-    
+
             Storage::disk('public')->put($path, file_get_contents($foto));
-    
+
             $data['image'] = $filename;
         }
-    
+
         // Simpan data pengguna baru
         $user = User::create($data);
-    
+
         // Simpan relasi antara pengguna dan peran
         $user->roles()->attach($request->role_id);
-    
+
         return redirect()->route('admin.usermanagement')->with('success', 'Data berhasil ditambahkan.');
     }
-    
+
     public function show($userId)
     {
         $user = User::find($userId);
@@ -86,7 +88,7 @@ class AdminController extends Controller
         $data = User::findOrFail($id);
         $roles = Role::all(); // Ambil semua data peran (roles)
         return view('admin.users.edituser', compact('data', 'roles'));
-    }    
+    }
 
     public function updateuser(Request $request, $id)
     {
@@ -97,31 +99,32 @@ class AdminController extends Controller
             'gender'    => 'required',
             'password'  => 'nullable',
         ]);
-    
+
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
         }
-    
+
         $data['name']       = $request->name;
         $data['email']      = $request->email;
         $data['role_id']    = $request->role_id;
         $data['gender']     = $request->gender;
-    
+
         if ($request->password) {
             $data['password'] = Hash::make($request->password);
         }
-    
+
         // Update data pengguna
         $user = User::findOrFail($id);
         $user->update($data);
-    
-        return redirect()->route('admin.usermanagement')->with('warning', 'Data berhasil diupdate.');
-    }    
 
-    public function deleteuser(Request $request,$id){
+        return redirect()->route('admin.usermanagement')->with('warning', 'Data berhasil diupdate.');
+    }
+
+    public function deleteuser(Request $request, $id)
+    {
         $data = User::find($id);
 
-        if($data){
+        if ($data) {
             $data->delete();
         }
 

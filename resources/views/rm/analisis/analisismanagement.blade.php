@@ -5,19 +5,19 @@
     <div class="content-wrapper">
 
         @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
         @endif
         @if(session('danger'))
-            <div class="alert alert-danger">
-                {{ session('danger') }}
-            </div>
+        <div class="alert alert-danger">
+            {{ session('danger') }}
+        </div>
         @endif
         @if(session('warning'))
-            <div class="alert alert-warning">
-                {{ session('warning') }}
-            </div>
+        <div class="alert alert-warning">
+            {{ session('warning') }}
+        </div>
         @endif
 
         <div class="row">
@@ -46,16 +46,14 @@
                                                     <div class="action-buttons btn-toolbar d-flex justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
                                                         @foreach($data as $pasien)
                                                         @php $id_pasien = $pasien->id; @endphp
-                                                            <div class="btn-group" role="group" aria-label="First group">
-                                                                <a href="{{ route('admin.analisislama', ['id' => $id_pasien]) }}) }}" class="btn btn-warning btn-icon-text">
-                                                                    <i class="ti-pencil-alt btn-icon-prepend"></i> Analisis Lama
-                                                                </a>
-                                                            </div>
-                                                            <div class="btn-group" role="group" aria-label="Second group">
-                                                                <a href="{{ route('admin.analisisbaru', ['id' => $id_pasien]) }}" class="btn btn-success btn-icon-text">
-                                                                    <i class="ti-pencil-alt btn-icon-prepend"></i> Analisis Baru
-                                                                </a>
-                                                            </div>
+                                                        <div class="btn-group" role="group" aria-label="First group">
+                                                            <a href="{{ route('admin.analisislama', ['id' => $id_pasien]) }})" class="btn btn-warning btn-icon-text">
+                                                                <i class="ti-pencil-alt btn-icon-prepend"></i> Analisis Lama
+                                                            </a>
+                                                        </div>
+                                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+                                                            <i class="ti-pencil-alt btn-icon-prepend"></i> Analisis Baru
+                                                        </button>
                                                         @endforeach
                                                     </div>
                                                 </td>
@@ -72,4 +70,38 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Analisis Baru</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="tanggal">Tanggal</label>
+                    <input type="date" class="form-control" id="tanggal" name="tanggal">
+                </div>
+                <div class="form-group">
+                    <label for="dokter">Dokter</label>
+                    <select id="dokter" class="form-control" name="dokter" required>
+                        <option value="">Pilih Dokter</option>
+                        @foreach($usersDokter as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection

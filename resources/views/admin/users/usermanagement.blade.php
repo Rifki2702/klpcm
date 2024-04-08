@@ -5,19 +5,19 @@
     <div class="content-wrapper">
 
         @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
         @endif
         @if(session('danger'))
-            <div class="alert alert-danger">
-                {{ session('danger') }}
-            </div>
+        <div class="alert alert-danger">
+            {{ session('danger') }}
+        </div>
         @endif
         @if(session('warning'))
-            <div class="alert alert-warning">
-                {{ session('warning') }}
-            </div>
+        <div class="alert alert-warning">
+            {{ session('warning') }}
+        </div>
         @endif
 
         <div class="row">
@@ -46,7 +46,7 @@
                                                 <td>{{ $d->name }}</td>
                                                 <td>
                                                     @foreach($d->roles as $role)
-                                                        {{ $role->name }}
+                                                    {{ $role->name }}
                                                     @endforeach
                                                 </td>
                                                 <td>{{ $d->email }}</td>
