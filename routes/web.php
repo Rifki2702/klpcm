@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/login', [LoginController::class, 'index'])->name('login');
+Route::get('/', [LoginController::class, 'index'])->name('login');
 Route::post('/login-proses', [LoginController::class, 'login_proses'])->name('login-proses');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -53,9 +53,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::delete('/deletepasien/{id}', [RMController::class, 'deletepasien'])->name('deletepasien');
 
     Route::get('/analisismanagement', [RMController::class, 'analisismanagement'])->name('analisismanagement');
-    Route::get('/analisisbaru/{id}', [RMController::class, 'analisisbaru'])->name('analisisbaru');
+    Route::get('/analisisbaru/{analisis_id}', [RMController::class, 'analisisbaru'])->name('analisisbaru');
     Route::get('/analisislama/{id}', [RMController::class, 'analisislama'])->name('analisislama');
-    Route::post('/insertbaru/{id}', [RMController::class, 'insertbaru'])->name('insertbaru');
+    Route::post('/insertawal', [RMController::class, 'insertawal'])->name('insertawal');
+    Route::post('/insertform', [RMController::class, 'insertform'])->name('insertform');
+    Route::get('/hasil/{id}', [RMController::class, 'hasil'])->name('hasil');
 
     Route::get('/viewklpcm', [DokterController::class, 'viewklpcm'])->name('viewklpcm');
 

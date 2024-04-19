@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateKelengkapanTable extends Migration
@@ -12,6 +11,7 @@ class CreateKelengkapanTable extends Migration
      *
      * @return void
      */
+
     public function up()
     {
         if (!Schema::hasTable('kelengkapan')) {
@@ -19,18 +19,16 @@ class CreateKelengkapanTable extends Migration
                 $table->id();
                 $table->unsignedBigInteger('formulir_id');
                 $table->unsignedBigInteger('isi_form_id');
-                $table->unsignedBigInteger('user_id');
-                $table->unsignedBigInteger('pasien_id');
-                $table->enum('kualitatif', ['lengkap', 'tidak lengkap']);
+                $table->unsignedBigInteger('analisis_id');
                 $table->enum('kuantitatif', ['lengkap', 'tidak lengkap']);
+                $table->enum('kualitatif', ['lengkap', 'tidak lengkap']);
                 $table->timestamp('tglberkas')->nullable();
-                $table->timestamp('tglcek')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
+                $table->timestamp('tglcek')->nullable()->default(now());
                 $table->timestamps();
 
-                $table->foreign('formulir_id')->references('id')->on('formulirs')->onDelete('cascade');
-                $table->foreign('isi_form_id')->references('id')->on('isi_forms');
-                $table->foreign('user_id')->references('id')->on('users');
-                $table->foreign('pasien_id')->references('id')->on('pasiens');
+                $table->foreign('formulir_id')->references('id')->on('formulir');
+                $table->foreign('isi_form_id')->references('id')->on('isi_form');
+                $table->foreign('analisis_id')->references('id')->on('analisis');
             });
         }
     }

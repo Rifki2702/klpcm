@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Schema;
 class CreateUsersTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi.
      */
     public function up(): void
     {
+        Schema::dropIfExists('users'); // Hapus tabel users jika sudah ada sebelumnya
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -22,41 +24,19 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
 
-            $table->foreign('role_id')->references('id')->on('roles');
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('set null'); // Tambahkan onDelete('set null') untuk menyelesaikan masalah foreign key constraint
         });
     }
 
     /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('users');
-    }
-}
-
-// Migration untuk menambahkan kolom role_id ke tabel users
-class AddRoleIdToUsersTable extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('role_id')->nullable();
-            $table->foreign('role_id')->references('id')->on('roles');
-        });
-    }
-
-    /**
-     * Reverse the migrations.
+     * Batalkan migrasi.
      */
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign(['role_id']);
-            $table->dropColumn('role_id');
         });
+
+        Schema::dropIfExists('users');
     }
 }
