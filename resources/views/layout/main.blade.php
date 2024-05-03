@@ -54,50 +54,37 @@
                 <ul class="navbar-nav navbar-nav-right">
                     <li class="nav-item dropdown">
                         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
-                            <i class="icon-bell mx-0"></i>
-                            <span class="count"></span>
+                            <i class="icon-bell"></i>
+                            @php
+                            $unreadCount = auth()->user()->unreadNotifications->count();
+                            @endphp
+                            @if($unreadCount > 0)
+                            <span class="count" id="notification-count"></span>
+                            @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
                             <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-                            <a class="dropdown-item preview-item">
-                                <div class="preview-thumbnail">
-                                    <div class="preview-icon bg-success">
-                                        <i class="ti-info-alt mx-0"></i>
+                            <div class="notification-list" style="max-height: 200px; overflow-y: auto;">
+                                @foreach(auth()->user()->notifications as $notification)
+                                @php
+                                $isComplete = $notification->data['is_complete'] ?? false;
+                                $bgColor = $isComplete ? 'bg-success' : 'bg-warning';
+                                @endphp
+                                <div class="dropdown-item preview-item @if(!$notification->read_at) unread @endif">
+                                    <div class="preview-thumbnail">
+                                        <div class="preview-icon {{ $bgColor }}">
+                                            <i class="ti-info-alt mx-0"></i>
+                                        </div>
+                                    </div>
+                                    <div class="preview-item-content">
+                                        <h6 class="preview-subject font-weight-normal">{{ $notification->data['message'] }}</h6>
+                                        <p class="font-weight-light small-text mb-0 text-muted">
+                                            {{ $notification->created_at->diffForHumans() }}
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="preview-item-content">
-                                    <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                                    <p class="font-weight-light small-text mb-0 text-muted">
-                                        Just now
-                                    </p>
-                                </div>
-                            </a>
-                            <a class="dropdown-item preview-item">
-                                <div class="preview-thumbnail">
-                                    <div class="preview-icon bg-warning">
-                                        <i class="ti-settings mx-0"></i>
-                                    </div>
-                                </div>
-                                <div class="preview-item-content">
-                                    <h6 class="preview-subject font-weight-normal">Settings</h6>
-                                    <p class="font-weight-light small-text mb-0 text-muted">
-                                        Private message
-                                    </p>
-                                </div>
-                            </a>
-                            <a class="dropdown-item preview-item">
-                                <div class="preview-thumbnail">
-                                    <div class="preview-icon bg-info">
-                                        <i class="ti-user mx-0"></i>
-                                    </div>
-                                </div>
-                                <div class="preview-item-content">
-                                    <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                                    <p class="font-weight-light small-text mb-0 text-muted">
-                                        2 days ago
-                                    </p>
-                                </div>
-                            </a>
+                                @endforeach
+                            </div>
                         </div>
                     </li>
                     <li class="nav-item nav-profile dropdown">
@@ -117,7 +104,7 @@
                     </li>
                 </ul>
                 <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
-                    <span class="icon-menu"></span>
+                    <span the="icon-menu"></span>
                 </button>
             </div>
         </nav>
@@ -126,21 +113,21 @@
             <!-- partial:partials/_sidebar.html -->
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
                 <ul class="nav">
-                    <li class="nav-item {{ Request::is('/') ? 'active' : '' }}">
+                    <li class="nav-item {{ Request::is('admin.dashboard') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.dashboard') }}">
                             <i class="fas fa-th-large menu-icon"></i>
                             <span class="menu-title">Dashboard</span>
                         </a>
                     </li>
                     @can('sidebar_admin')
-                    <li class="nav-item">
-                        <a class="nav-link {{ Request::is('admin.createuser') ? 'active' : '' }}" href="{{ route('admin.usermanagement') }}">
+                    <li class="nav-item {{ Request::is('admin/usermanagement', 'admin/createuser', 'admin/edituser/*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.usermanagement') }}">
                             <i class="fas fa-user menu-icon"></i>
                             <span class="menu-title">Tambah User</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Request::is('admin.createformulir') ? 'active' : '' }}" href="{{ route('admin.formulirmanagement') }}">
+                    <li class="nav-item {{ Request::is('admin/formulirmanagement', 'admin/createformulir', 'admin/createisi/*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.formulirmanagement') }}">
                             <i class="fas fa-file menu-icon"></i>
                             <span class="menu-title">Tambah Form</span>
                         </a>
@@ -148,19 +135,19 @@
                     @endcan
 
                     @can('sidebar_rm')
-                    <li class="nav-item">
+                    <li class="nav-item {{ Request::is('admin.pasienmanagement') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.pasienmanagement') }}">
                             <i class="fas fa-user-nurse menu-icon"></i>
                             <span class="menu-title">Tambah Pasien</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {{ Request::is('admin/analisismanagement', 'admin/analisisbaru/*', 'admin/analisislama/*', 'admin/analisiskualitatif/*', 'admin/hasil/*', 'admin/pdf/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.analisismanagement') }}">
                             <i class="fas fa-search menu-icon"></i>
                             <span class="menu-title">Analisis DRM</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {{ Request::is('admin/laporanmanagement', 'admin/laporanfilter/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.laporanmanagement') }}">
                             <i class="icon-bar-graph menu-icon"></i>
                             <span class="menu-title">Laporan</span>
@@ -169,12 +156,11 @@
                     @endcan
 
                     @can('sidebar_dokter')
-                    <li class="nav-item">
+                    <li class="nav-item {{ Request::is('admin.viewklpcm') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.viewklpcm') }}">
                             <i class="fas fa-chart-bar menu-icon"></i>
                             <span class="menu-title">View KLPCM</span>
                         </a>
-                    </li>
                     </li>
                     @endcan
                 </ul>
@@ -186,9 +172,6 @@
         </div>
         <!-- page-body-wrapper ends -->
     </div>
-    <!-- container-scroller -->
-
-    <!-- plugins:js -->
     <script src="{{ asset('skydash/vendors/js/vendor.bundle.base.js')}}"></script>
     <!-- endinject -->
     <!-- Plugin js for this page -->
@@ -200,7 +183,7 @@
 
     <!-- End plugin js for this page -->
     <!-- inject:js -->
-    <script src="{ { asset('skydash/js/off-canvas.js')}}"></script>
+    <script src="{{ asset('skydash/js/off-canvas.js')}}"></script>
     <script src="{{ asset('skydash/js/hoverable-collapse.js')}}"></script>
     <script src="{{ asset('skydash/js/template.js')}}"></script>
     <script src="{{ asset('skydash/js/settings.js')}}"></script>
@@ -215,6 +198,47 @@
     <script src="{{ asset('skydash/js/chart.js')}}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.min.js" integrity="sha384-Jg2f/XvOoFIoqw/i5X+TYjI2YJT0QCsNQ+0Jgy9P1kD2a8swITZcK7vjpM6dkA2t" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $('#userTable').DataTable({
+                "pagingType": "full_numbers",
+                "lengthMenu": [
+                    [5, 10, 25, 50, -1],
+                    [5, 10, 25, 50, "All"]
+                ],
+                "dom": '<"row"<"col-sm-1"l><"col-sm-11"f>><"row"<"col-sm-12"t>><"row"<"col-sm-3"i><"col-sm-9"p>>',
+                responsive: true,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search records",
+                }
+            });
+        });
+    </script>
+    <script>
+        function updateChart(timeFrame) {
+            fetch(`/dashboard/chart/${timeFrame}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('kuantitatifChartContainer').innerHTML = data.chart;
+                })
+                .catch(error => console.error('Error loading the chart:', error));
+        }
+    </script>
+    <script>
+        // Menghilangkan jumlah notifikasi setelah diklik
+        document.addEventListener('DOMContentLoaded', function() {
+            var countElement = document.getElementById('notification-count');
+            if (countElement) {
+                countElement.addEventListener('click', function() {
+                    countElement.style.display = 'none';
+                    // Mengirim request ke backend untuk menandai notifikasi sebagai sudah dibaca
+                    // Route [ notifications.markAsRead ] not defined, hence removed the fetch call
+                });
+            }
+        });
+    </script>
+
     <!-- End custom js for this page-->
 </body>
 

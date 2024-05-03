@@ -19,18 +19,19 @@
             {{ session('warning') }}
         </div>
         @endif
-
+        <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#modalTambahFormulir"><i class="fas fa-solid fa-file-signature"></i>
+            Tambah Formulir
+        </button>
         <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <a href="{{ route('admin.createformulir') }}" class="btn btn-primary mb-3"><i class="fas fa-solid fa-file-signature"></i> Tambah Form </a>
                         <div class="row">
                         </div>
                         <div class="row">
                             <div class="col-12">
                                 <div class="table-responsive table-striped" style="text-align: center;">
-                                    <table id="example" class="display expandable-table" style="width:100%">
+                                    <table id="userTable" class="display expandable-table" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
@@ -68,8 +69,7 @@
                                                             </form>
                                                         </div>
                                                     </div>
-
-                                                    <!-- Modal -->
+                                                    <!-- Modal view -->
                                                     <div class="modal fade" id="viewModal{{ $d->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                         <div class="modal-dialog" role="document">
                                                             <div class="modal-content">
@@ -103,6 +103,44 @@
                                             @endforeach
                                         </tbody>
                                     </table>
+                                    <!-- Modal tambah form-->
+                                    <div class="modal fade" id="modalTambahFormulir" tabindex="-1" role="dialog" aria-labelledby="modalTambahFormulirLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalTambahFormulirLabel">Tambah Formulir</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('admin.insertformulir') }}" method="POST" enctype="multipart/form-data">
+                                                        @csrf
+                                                        <div class="form-group row">
+                                                            <label for="nama_formulir" class="col-sm-4 col-form-label text-left">Nama Formulir</label>
+                                                            <label class="col-sm-1 col-form-label text-left">:</label>
+                                                            <div class="col-sm-7">
+                                                                <input type="text" class="form-control" id="nama_formulir" name="nama_formulir" placeholder="Nama Formulir">
+                                                                @error('nama_formulir')
+                                                                <small>{{ $message }}</small>
+                                                                @enderror
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-success btn-icon-text">
+                                                                <i class="ti-save btn-icon-prepend"></i>
+                                                                Simpan
+                                                            </button>
+                                                            <button type="reset" class="btn btn-danger btn-icon-text">
+                                                                <i class="ti-reload btn-icon-prepend"></i>
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

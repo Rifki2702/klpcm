@@ -66,51 +66,6 @@
                 </div>
             </div>
         </div>
-        <!-- Modal -->
-        <div class="modal fade" id="tambahmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Analisis Baru</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ route('admin.insertawal') }}" method="POST">
-                            @csrf
-                            <div class="form-group row">
-                                <label for="tglberkas" class="col-sm-4 col-form-label">Tanggal Berkas</label>
-                                <label class="col-sm-1 col-form-label text-center">:</label>
-                                <div class="col-sm-7">
-                                    <input id="tglberkas" type="date" class="form-control" name="tanggal" required>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="dokter" class="col-sm-4 col-form-label">Dokter</label>
-                                <label class="col-sm-1 col-form-label text-center">:</label>
-                                <div class="col-sm-7">
-                                    <select id="dokter" class="form-control" name="dokter" required>
-                                        <option value="">Pilih Dokter</option>
-                                        @foreach($usersDokter as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <!-- Hidden input for pasien_id -->
-                            <input type="hidden" name="pasien_id" value="{{ $pasien->id }}">
-                            <!-- Input for tglcek will be filled with current time when saving -->
-                            <input type="hidden" name="tglcek" value="{{ now()->format('Y-m-d H:i:s') }}">
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 </div>

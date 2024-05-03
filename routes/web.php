@@ -6,6 +6,7 @@ use App\Http\Controllers\DokterController;
 use App\Http\Controllers\FormulirController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RMController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,16 +30,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/editprofile/{id}', [DashboardController::class, 'editprofile'])->name('editprofile');
     Route::put('/updateprofile/{id}', [DashboardController::class, 'updateprofile'])->name('updateprofile');
+    Route::get('/getchart', [DashboardController::class, 'getchart'])->name('getchart');
 
     Route::get('/usermanagement', [AdminController::class, 'usermanagement'])->name('usermanagement');
-    Route::get('/createuser', [AdminController::class, 'createuser'])->name('createuser');
     Route::post('/insertuser', [AdminController::class, 'insertuser'])->name('insertuser');
-    Route::get('/edituser/{id}', [AdminController::class, 'edituser'])->name('edituser');
     Route::put('/updateuser/{id}', [AdminController::class, 'updateuser'])->name('updateuser');
     Route::delete('/deleteuser/{id}', [AdminController::class, 'deleteuser'])->name('deleteuser');
 
     Route::get('/formulirmanagement', [FormulirController::class, 'formulirmanagement'])->name('formulirmanagement');
-    Route::get('/createformulir', [FormulirController::class, 'createformulir'])->name('createformulir');
     Route::post('/insertformulir', [FormulirController::class, 'insertformulir'])->name('insertformulir');
     Route::delete('/deleteformulir/{id}', [FormulirController::class, 'deleteformulir'])->name('deleteformulir');
     Route::get('/createisi/{id}', [FormulirController::class, 'createisi'])->name('createisi');
@@ -46,7 +45,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::get('/deleteisi/{id}', [FormulirController::class, 'deleteisi'])->name('deleteisi');
 
     Route::get('/pasienmanagement', [RMController::class, 'pasienmanagement'])->name('pasienmanagement');
-    Route::get('/createpasien', [RMController::class, 'createpasien'])->name('createpasien');
     Route::post('/insertpasien', [RMController::class, 'insertpasien'])->name('insertpasien');
     Route::get('/editpasien/{id}', [RMController::class, 'editpasien'])->name('editpasien');
     Route::put('/updatepasien/{id}', [RMController::class, 'updatepasien'])->name('updatepasien');
@@ -57,9 +55,20 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::get('/analisislama/{id}', [RMController::class, 'analisislama'])->name('analisislama');
     Route::post('/insertawal', [RMController::class, 'insertawal'])->name('insertawal');
     Route::post('/insertform', [RMController::class, 'insertform'])->name('insertform');
-    Route::get('/hasil/{id}', [RMController::class, 'hasil'])->name('hasil');
+    Route::get('/analisiskualitatif/{analisis_id}', [RMController::class, 'analisiskualitatif'])->name('analisiskualitatif');
+    Route::post('/insertkualitatif', [RMController::class, 'insertkualitatif'])->name('insertkualitatif');
+    Route::get('/hasil/{analisis_id}', [RMController::class, 'hasil'])->name('hasil');
+    Route::get('pdf/{analisis_id}', [RMController::class, 'pdf'])->name('hasil.pdf');
+    Route::get('/editkuantitatif/{analisis_id}', [RMController::class, 'editkuantitatif'])->name('editkuantitatif');
+    Route::put('/updateform', [RMController::class, 'updateform'])->name('updateform');
+    Route::get('/editkualitatif/{analisis_id}', [RMController::class, 'editkualitatif'])->name('editkualitatif');
+    Route::put('/updatekualitatif', [RMController::class, 'updatekualitatif'])->name('updatekualitatif');
 
     Route::get('/viewklpcm', [DokterController::class, 'viewklpcm'])->name('viewklpcm');
+    Route::get('/ketidaklengkapan', [DokterController::class, 'ketidaklengkapan'])->name('ketidaklengkapan');
 
     Route::get('/laporanmanagement', [LaporanController::class, 'laporanmanagement'])->name('laporanmanagement');
+    Route::get('/laporan/filter', [LaporanController::class, 'laporanmanagement'])->name('laporanfilter');
+    Route::get('/laporan/pdf', [LaporanController::class, 'downloadPDF'])->name('laporanpdf');
+    Route::get('/laporan/excel', [LaporanController::class, 'downloadExcel'])->name('laporanexcel');
 });

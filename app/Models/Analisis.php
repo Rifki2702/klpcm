@@ -21,12 +21,28 @@ class Analisis extends Model
     // Definisikan relasi dengan model User
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // Definisikan relasi dengan model Pasien
     public function pasien()
     {
-        return $this->belongsTo(Pasien::class);
+        return $this->belongsTo(Pasien::class, 'pasien_id');
+    }
+
+    public function kelengkapans()
+    {
+        return $this->hasMany(Kelengkapan::class);
+    }
+
+    public function ketepatans()
+    {
+        return $this->hasMany(Ketepatan::class);
+    }
+
+    // Definisikan relasi dengan model Formulir
+    public function formulirs()
+    {
+        return $this->hasMany(Formulir::class);
     }
 }

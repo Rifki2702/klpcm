@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Analisis;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,8 +26,9 @@ class AdminController extends Controller
 
     public function usermanagement()
     {
+        $roles = Role::all();
         $data = User::get();
-        return view('admin.users.usermanagement', compact('data'));
+        return view('admin.users.usermanagement', compact('data', 'roles'));
     }
 
     public function createuser()
@@ -122,11 +124,20 @@ class AdminController extends Controller
 
     public function deleteuser(Request $request, $id)
     {
-        $data = User::find($id);
+        $user = User::find($id);
 
-        if ($data) {
-            $data->delete();
+        if (!$user) {
+            return redirect()->route('admin.usermanagement')->with('danger', 'Data tidak ditemukan.');
         }
+
+        // Hapus data yang terkait dari tabel analisis
+        $analisis = Analisis::where('user_id', $id)->get();
+        foreach ($analisis as $a) {
+            $a->delete();
+        }
+
+        // Hapus data dari tabel users
+        $user->delete();
 
         return redirect()->route('admin.usermanagement')->with('danger', 'Data berhasil dihapus.');
     }
