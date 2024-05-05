@@ -18,11 +18,11 @@
                     <div class="card shadow">
                         <div class="card-body">
                             <h4 class="card-title">Ubah Identitas</h4>
-                            <form action="{{ route('admin.updateuser', Auth::user()->id) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('admin.updateuser', ['id' => Auth::user()->id]) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <div class="form-group">
-                                    <label for="name">Nama Depan</label>
+                                    <label for="name">Nama</label>
                                     <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->name }}" required>
                                 </div>
                                 <div class="form-group">
@@ -41,8 +41,8 @@
                                     <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password baru jika ingin mengubah">
                                 </div>
                                 <div class="form-group">
-                                    <label for="photo">Foto</label>
-                                    <input type="file" class="form-control-file" id="photo" name="photo">
+                                    <label for="image">Foto</label>
+                                    <input type="file" class="form-control-file" id="image" name="image">
                                 </div>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </form>

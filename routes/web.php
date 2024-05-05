@@ -29,7 +29,7 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/editprofile/{id}', [DashboardController::class, 'editprofile'])->name('editprofile');
-    Route::put('/updateprofile/{id}', [DashboardController::class, 'updateprofile'])->name('updateprofile');
+    Route::put('/updateuser/{id}', [DashboardController::class, 'updateuser'])->name('updateuser');
     Route::get('/getchart', [DashboardController::class, 'getchart'])->name('getchart');
 
     Route::get('/usermanagement', [AdminController::class, 'usermanagement'])->name('usermanagement');
@@ -71,7 +71,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::get('/laporan/filter', [LaporanController::class, 'laporanmanagement'])->name('laporanfilter');
     Route::get('/laporan/pdf', [LaporanController::class, 'downloadPDF'])->name('laporanpdf');
     Route::get('/laporan/excel', [LaporanController::class, 'downloadExcel'])->name('laporanexcel');
-
 });
 // NOTIFICATION READ
 Route::get('/notification', [NotificationController::class, 'markRead'])->name('notifications.markAsRead');

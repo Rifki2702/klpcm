@@ -58,13 +58,13 @@
                                                                     <div class="col d-flex justify-content-center">
                                                                         <div class="form-check form-check-inline">
                                                                             <label class="form-check-label" for="lengkap{{ $isiForm->id }}">
-                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="lengkap{{ $isiForm->id }}" value="1" {{ old('kuantitatif.'.$isiForm->id) == '1' ? 'checked' : (optional($isiForm->kelengkapan)->kuantitatif == '1' ? 'checked' : '') }}>
+                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="lengkap{{ $isiForm->id }}" value="1" {{ $isiForm->kelengkapan && $isiForm->kelengkapan->kuantitatif == '1' ? 'checked' : '' }}>
                                                                                 Lengkap
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check form-check-inline">
                                                                             <label class="form-check-label" for="tidaklengkap{{ $isiForm->id }}">
-                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="tidaklengkap{{ $isiForm->id }}" value="0" {{ old('kuantitatif.'.$isiForm->id) == '0' ? 'checked' : (optional($isiForm->kelengkapan)->kuantitatif == '0' ? 'checked' : '') }}>
+                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="tidaklengkap{{ $isiForm->id }}" value="0" {{ $isiForm->kelengkapan && $isiForm->kelengkapan->kuantitatif == '0' ? 'checked' : '' }}>
                                                                                 Tidak Lengkap
                                                                             </label>
                                                                         </div>

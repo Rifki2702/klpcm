@@ -57,13 +57,13 @@
                                                                     <div class="col d-flex justify-content-center">
                                                                         <div class="form-check form-check-inline">
                                                                             <label class="form-check-label" for="lengkap{{ $isiForm->id }}">
-                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="lengkap{{ $isiForm->id }}" value="1" {{ isset($isiForm->kelengkapan) && $isiForm->kelengkapan->kuantitatif ? 'checked' : '' }}>
+                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="lengkap{{ $isiForm->id }}" value="1">
                                                                                 Lengkap
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check form-check-inline">
                                                                             <label class="form-check-label" for="tidaklengkap{{ $isiForm->id }}">
-                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="tidaklengkap{{ $isiForm->id }}" value="0" {{ isset($isiForm->kelengkapan) && $isiForm->kelengkapan->kuantitatif ? 'checked' : '' }}>
+                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="tidaklengkap{{ $isiForm->id }}" value="0">
                                                                                 Tidak Lengkap
                                                                             </label>
                                                                         </div>

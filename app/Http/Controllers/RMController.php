@@ -275,8 +275,8 @@ class RMController extends Controller
             $user = User::find($analisis->user_id);
 
             $analisisData = Analisis::where('pasien_id', $analisis->pasien_id)
-                        ->with(['kelengkapans', 'ketepatans']) // Tambahkan eager loading untuk 'ketepatans'
-                        ->get();
+                ->with(['kelengkapans', 'ketepatans']) // Tambahkan eager loading untuk 'ketepatans'
+                ->get();
             // Persentase
             $hasilJumlahKuantitatif = [];
             foreach ($analisisData as $item) {
@@ -314,7 +314,7 @@ class RMController extends Controller
                     'message' => 'Terdapat Data belum lengkap dengan nomor RM ' . $noRM . '. Lengkapi sebelum tanggal ' . $tanggalLengkapi,
                     'link' => route('admin.viewklpcm'),
                     'is_complete' => false,
-                    'analisis' => number_format($hasilJumlahKuantitatif[$id_test]['persentase'], 2).'%',
+                    'analisis' => number_format($hasilJumlahKuantitatif[$id_test]['persentase'], 2) . '%',
                 ];
                 Notification::send($user, new KelengkapanNotification($data));
             } else {
@@ -322,7 +322,7 @@ class RMController extends Controller
                     'message' => 'Data lengkap',
                     'link' => route('admin.viewklpcm'),
                     'is_complete' => true,
-                    'analisis' => number_format($hasilJumlahKuantitatif[$id_test]['persentase'], 2).'%',
+                    'analisis' => number_format($hasilJumlahKuantitatif[$id_test]['persentase'], 2) . '%',
                 ];
                 Notification::send($user, new KelengkapanNotification($data));
             }
@@ -333,7 +333,6 @@ class RMController extends Controller
             DB::rollBack();
             return $e;
         }
-
     }
 
     public function editkuantitatif($analisis_id)
@@ -345,11 +344,11 @@ class RMController extends Controller
             $query->where('name', 'dokter');
         })->get();
 
-        $formulirs = Formulir::with(['kelengkapans' => function ($query) use ($analisis_id) {
-            $query->where('analisis_id', $analisis_id)->select('formulir_id', 'kuantitatif');
-        }])->whereHas('kelengkapans', function ($query) use ($analisis_id) {
-            $query->where('analisis_id', $analisis_id);
-        })->get();
+        $formulirs = Formulir::with(['isiForms' => function ($query) use ($analisis_id) {
+            $query->with(['kelengkapan' => function ($query) use ($analisis_id) {
+                $query->where('analisis_id', $analisis_id)->select('isi_form_id', 'kuantitatif');
+            }]);
+        }])->get();
 
         return view('rm.analisis.edit.editkuantitatif', compact('rm_pasien', 'usersDokter', 'formulirs', 'analisis'));
     }
@@ -398,23 +397,25 @@ class RMController extends Controller
         $analisis = Analisis::findOrFail($analisisId);
         $rm_pasien = $analisis->pasien->rm;
         $usersDokter = User::where('role_id', 3)->get(); // Assuming 3 is the role_id for dokter
-        $formulirs = Formulir::all();
         $kualitatifs = Kualitatif::all(); // Mengambil semua data dari tabel kualitatif
         $ketepatan = Ketepatan::all();
 
         return view('rm.analisis.analisiskualitatif', compact('analisis', 'rm_pasien', 'usersDokter', 'formulirs', 'kualitatifs', 'ketepatan'));
     }
 
-    public function editkualitatif($analisisId)
+    public function editkualitatif($analisis_id)
     {
-        $analisis = Analisis::findOrFail($analisisId);
+        $analisis = Analisis::findOrFail($analisis_id);
         $rm_pasien = $analisis->pasien->rm;
-        $usersDokter = User::where('role_id', 3)->get(); // Assuming 3 is the role_id for dokter
-        $formulirs = Formulir::all();
-        $kualitatifs = Kualitatif::all(); // Mengambil semua data dari tabel kualitatif
-        $ketepatan = Ketepatan::all();
 
-        return view('rm.analisis.edit.editkualitatif', compact('analisis', 'rm_pasien', 'usersDokter', 'formulirs', 'kualitatifs', 'ketepatan'));
+        $usersDokter = User::whereHas('roles', function ($query) {
+            $query->where('name', 'dokter');
+        })->get();
+
+        // Ambil data Ketepatan yang terkait dengan analisis_id
+        $ketepatans = Ketepatan::where('analisis_id', $analisis_id)->with('kualitatif')->get();
+
+        return view('rm.analisis.edit.editkualitatif', compact('rm_pasien', 'usersDokter', 'ketepatans', 'analisis'));
     }
 
     public function insertkualitatif(Request $request)
@@ -438,28 +439,14 @@ class RMController extends Controller
 
     public function updatekualitatif(Request $request)
     {
-        // Validasi data formulir
-        $validatedData = $request->validate([
-            'analisis_id' => 'required',
-            'kualitatif.*' => 'required|in:0,1',
-        ]);
+        $id = $request->analisis_id;
+        $analisis = Analisis::findOrFail($id);
 
-        // Periksa apakah $request->kualitatif adalah array atau objek yang valid
-        if (!is_array($request->kualitatif) && !is_object($request->kualitatif)) {
-            // Tampilkan pesan error atau lakukan penanganan lainnya
-            return redirect()->back()->with('error', 'Data kualitatif tidak valid');
+        foreach ($request->kualitatif as $key => $value) {
+            $analisis->ketepatans()->where('id', $key)->update(['ketepatan' => $value]);
         }
 
-        // Lakukan iterasi jika $request->kualitatif adalah array atau objek yang valid
-        foreach ($request->kualitatif as $kualitatifId => $value) {
-            $kualitatif = Kualitatif::findOrFail($kualitatifId);
-            $kualitatif->ketepatans()->updateOrCreate(
-                ['analisis_id' => $request->analisis_id],
-                ['ketepatan' => $value ? 1 : 0]
-            );
-        }
-
-        return redirect()->route('admin.analisislama', ['id' => $request->analisis_id])->with('success', 'Data berhasil disimpan');
+        return redirect()->route('admin.hasil', ['analisis_id' => $id])->with('success', 'Data berhasil disimpan');
     }
 
     public function hasil($analisisId)

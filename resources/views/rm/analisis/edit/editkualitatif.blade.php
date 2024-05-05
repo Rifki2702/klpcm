@@ -9,7 +9,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
-                                <div class="text mb-4">No RM: <strong class="text-Black">{{ $rm_pasien }}</strong></div>
+                                <div class="text mb-4">No RM: <strong class="text-black">{{ $rm_pasien }}</strong></div>
                                 <form id="form" action="{{ route('admin.updatekualitatif', ['id' => $analisis->id]) }}" method="POST">
                                     @csrf
                                     @method('PUT')
@@ -28,7 +28,7 @@
                                             <select id="dokter" class="form-control" name="dokter" required disabled>
                                                 <option value="">Pilih Dokter</option>
                                                 @foreach($usersDokter as $user)
-                                                <option value="{{ $user->id }}" {{ isset($analisis) && $analisis->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                                                <option value="{{ $user->id }}" {{ $analisis->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -43,10 +43,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach($kualitatifs as $kualitatif)
+                                                @foreach($ketepatans as $kualitatif)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $kualitatif->isi }}</td>
+                                                    <td>{{ $kualitatif->kualitatif->isi }}</td>
                                                     <td>
                                                         <div class="row">
                                                             <div class="col d-flex justify-content-center">

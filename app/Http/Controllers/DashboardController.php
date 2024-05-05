@@ -9,7 +9,6 @@ use App\Models\Formulir;
 use App\Models\Kelengkapan;
 use App\Models\User;
 use App\Models\Pasien;
-use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +17,11 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function dashboard(KuantitatifChart $KuantitatifChart, KualitatifChart $KualitatifChart)
     {
         $jumlahTidakLengkap = Kelengkapan::where('kuantitatif', false)
@@ -65,33 +69,37 @@ class DashboardController extends Controller
 
     public function updateuser(Request $request)
     {
-        $id = Auth::id();
+        $id = Auth::id(); // Menggunakan ID dari user yang terautentikasi
         $validator = Validator::make($request->all(), [
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|string|email|max:255|unique:users,email,' . $id,
-            'gender'    => 'required|in:Laki-laki,Perempuan',
-            'password'  => 'nullable|min:6',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'gender' => 'required|in:Laki-laki,Perempuan',
+            'password' => 'nullable|string|min:8',
+            'image' => 'nullable|image|max:2048',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back()->withInput()->withErrors($validator);
         }
 
-        $user = User::find($id);
-        if (!$user) {
-            return redirect()->route('admin.dashboard')->withErrors('User not found.');
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'gender' => $request->gender,
+        ];
+
+        if ($request->password) {
+            $data['password'] = bcrypt($request->password);
         }
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->gender = $request->gender;
-
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('photos', 'public');
+            $data['photo'] = $imagePath;
         }
 
-        $user->save();
+        $user = User::findOrFail($id);
+        $user->update($data);
 
-        return redirect()->route('admin.dashboard')->with('success', 'User updated successfully.');
+        return redirect()->route('dashboard')->with('success', 'Data berhasil diperbarui');
     }
 }
