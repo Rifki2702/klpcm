@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\Pasien;
 use App\Models\User;
 use App\Notifications\KelengkapanNotification;
+use Exception;
 use Mpdf\Mpdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -142,7 +143,6 @@ class RMController extends Controller
         $analisis = Analisis::where('pasien_id', $id)
             ->with(['kelengkapans', 'ketepatans']) // Tambahkan eager loading untuk 'ketepatans'
             ->get();
-
         // Buat array untuk menyimpan hasil jumlah kuantitatif, jumlah kualitatif, dan persentase
         $hasilJumlahKuantitatif = [];
         $hasilJumlahKualitatif = [];
@@ -234,55 +234,106 @@ class RMController extends Controller
     public function insertForm(Request $request)
     {
         // Validasi request
+        DB::beginTransaction();
         $validated = $request->validate([
             'analisis_id' => 'required|exists:analisis,id',
             'kuantitatif' => 'required|array',
             'kuantitatif.*' => 'boolean',
         ]);
+        try {
+            $dataKelengkapans = [];
+            $containsFalse = false; // Flag untuk menandakan apakah terdapat nilai boolean false
 
-        $dataKelengkapans = [];
-        $containsFalse = false; // Flag untuk menandakan apakah terdapat nilai boolean false
+            // Iterasi semua inputan kuantitatif
+            foreach ($request->kuantitatif as $isiFormId => $statusKuantitatif) {
+                // Cek apakah IsiForm tersedia
+                $isiForm = IsiForm::find($isiFormId);
+                if (!$isiForm) {
+                    return redirect()->back()->with('error', 'IsiForm tidak ditemukan');
+                }
 
-        // Iterasi semua inputan kuantitatif
-        foreach ($request->kuantitatif as $isiFormId => $statusKuantitatif) {
-            // Cek apakah IsiForm tersedia
-            $isiForm = IsiForm::find($isiFormId);
-            if (!$isiForm) {
-                return redirect()->back()->with('error', 'IsiForm tidak ditemukan');
+                // Persiapkan data untuk disimpan
+                $dataKelengkapans[] = [
+                    'analisis_id' => $request->analisis_id,
+                    'formulir_id' => $isiForm->formulir_id,
+                    'isi_form_id' => $isiFormId,
+                    'kuantitatif' => $statusKuantitatif,
+                ];
+
+                // Periksa jika terdapat nilai boolean false
+                if (!$statusKuantitatif) {
+                    $containsFalse = true;
+                }
             }
 
-            // Persiapkan data untuk disimpan
-            $dataKelengkapans[] = [
-                'analisis_id' => $request->analisis_id,
-                'formulir_id' => $isiForm->formulir_id,
-                'isi_form_id' => $isiFormId,
-                'kuantitatif' => $statusKuantitatif,
-            ];
+            // Simpan semua data kuantitatif sekaligus ke dalam tabel Kelengkapan
+            // $id = DB::table('kelengkapan')->insertGetId([$dataKelengkapans]);
+            Kelengkapan::insert($dataKelengkapans);
 
-            // Periksa jika terdapat nilai boolean false
-            if (!$statusKuantitatif) {
-                $containsFalse = true;
+            // Kirim notifikasi
+            $analisis = Analisis::find($request->analisis_id);
+            $user = User::find($analisis->user_id);
+
+            $analisisData = Analisis::where('pasien_id', $analisis->pasien_id)
+                        ->with(['kelengkapans', 'ketepatans']) // Tambahkan eager loading untuk 'ketepatans'
+                        ->get();
+            // Persentase
+            $hasilJumlahKuantitatif = [];
+            foreach ($analisisData as $item) {
+                // Pastikan kelengkapan dan ketepatan tidak null sebelum melakukan operasi
+                if ($item->kelengkapans && $item->ketepatans) {
+                    // Hitung jumlah kuantitatif yang memiliki nilai boolean 1
+                    $jumlahKuantitatif = $item->kelengkapans->where('kuantitatif', true)->count();
+                    // Hitung jumlah kualitatif yang memiliki nilai boolean 1 pada tabel ketepatan
+                    $jumlahKualitatif = $item->ketepatans->where('ketepatan', true)->count();
+
+                    // Hitung persentase kelengkapan kuantitatif
+                    $persentaseKuantitatif = count($item->kelengkapans) > 0 ? round(($jumlahKuantitatif / count($item->kelengkapans)) * 100, 2) : 0;
+                    // Hitung persentase ketepatan kualitatif
+                    $persentaseKualitatif = count($item->ketepatans) > 0 ? round(($jumlahKualitatif / count($item->ketepatans)) * 100, 2) : 0;
+
+                    // Simpan hasil jumlah kuantitatif dan persentase ke dalam array
+                    $hasilJumlahKuantitatif[$item->id] = [
+                        'jumlah' => $jumlahKuantitatif,
+                        'persentase' => $persentaseKuantitatif
+                    ];
+                } else {
+                    // Jika kelengkapan atau ketepatan adalah null, set nilai default
+                    $hasilJumlahKuantitatif[$item->id] = [
+                        'jumlah' => 0,
+                        'persentase' => 0
+                    ];
+                }
             }
+            // Kirim notifikasi hanya jika terdapat nilai boolean false
+            $id_test = Analisis::latest()->first()->id;
+            if ($containsFalse) {
+                $noRM = $analisis->pasien->rm;
+                $tanggalLengkapi = now()->addDays(2)->format('d-m-Y');
+                $data = [
+                    'message' => 'Terdapat Data belum lengkap dengan nomor RM ' . $noRM . '. Lengkapi sebelum tanggal ' . $tanggalLengkapi,
+                    'link' => route('admin.viewklpcm'),
+                    'is_complete' => false,
+                    'analisis' => number_format($hasilJumlahKuantitatif[$id_test]['persentase'], 2).'%',
+                ];
+                Notification::send($user, new KelengkapanNotification($data));
+            } else {
+                $data = [
+                    'message' => 'Data lengkap',
+                    'link' => route('admin.viewklpcm'),
+                    'is_complete' => true,
+                    'analisis' => number_format($hasilJumlahKuantitatif[$id_test]['persentase'], 2).'%',
+                ];
+                Notification::send($user, new KelengkapanNotification($data));
+            }
+            DB::commit();
+            // Redirect dengan pesan sukses dan parameter analisis_id
+            return redirect()->route('admin.analisiskualitatif', ['analisis_id' => $request->analisis_id]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return $e;
         }
 
-        // Simpan semua data kuantitatif sekaligus ke dalam tabel Kelengkapan
-        Kelengkapan::insert($dataKelengkapans);
-
-        // Kirim notifikasi
-        $analisis = Analisis::find($request->analisis_id);
-        $user = User::find($analisis->user_id);
-
-        // Kirim notifikasi hanya jika terdapat nilai boolean false
-        if ($containsFalse) {
-            $noRM = $analisis->pasien->rm;
-            $tanggalLengkapi = now()->addDays(2)->format('d-m-Y');
-            Notification::send($user, new KelengkapanNotification('Terdapat Data belum lengkap dengan nomor RM ' . $noRM . '. Lengkapi sebelum tanggal ' . $tanggalLengkapi));
-        } else {
-            Notification::send($user, new KelengkapanNotification('Data lengkap'));
-        }
-
-        // Redirect dengan pesan sukses dan parameter analisis_id
-        return redirect()->route('admin.analisiskualitatif', ['analisis_id' => $request->analisis_id]);
     }
 
     public function editkuantitatif($analisis_id)

@@ -71,4 +71,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::get('/laporan/filter', [LaporanController::class, 'laporanmanagement'])->name('laporanfilter');
     Route::get('/laporan/pdf', [LaporanController::class, 'downloadPDF'])->name('laporanpdf');
     Route::get('/laporan/excel', [LaporanController::class, 'downloadExcel'])->name('laporanexcel');
+
 });
+// NOTIFICATION READ
+Route::get('/notification', [NotificationController::class, 'markRead'])->name('notifications.markAsRead');
