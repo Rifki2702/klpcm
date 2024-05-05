@@ -6,7 +6,6 @@ use App\Http\Controllers\DokterController;
 use App\Http\Controllers\FormulirController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RMController;
 use Illuminate\Support\Facades\Route;
 
