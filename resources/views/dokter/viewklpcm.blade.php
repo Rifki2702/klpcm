@@ -35,7 +35,7 @@
                                                     </button>
                                                     <!-- Modal -->
                                                     <div class="modal fade" id="kelengkapanModal_{{ $loop->iteration }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                        <div class="modal-dialog" role="document">
+                                                        <div class="modal-dialog" role="document"> <!-- Ubah ukuran modal menjadi modal-lg -->
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                     <h5 class="modal-title" id="exampleModalLabel">Kelengkapan Analisis</h5>
@@ -44,16 +44,32 @@
                                                                     </button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    <!-- Isi konten modal disini -->
-                                                                    <p>No RM:</p>
-                                                                    <p>Nama: </p>
-                                                                    <p>Tgl Berkas: </p>
-                                                                    <p>Kuantitatif: %</p>
-                                                                    <!-- Tambahkan informasi lain yang diperlukan -->
+                                                                    <div class="row justify-content-center">
+                                                                        @php
+                                                                        $formulirGroups = $item->kelengkapanTidakLengkap->groupBy('nama_formulir');
+                                                                        @endphp
+                                                                        @foreach ($formulirGroups as $namaFormulir => $kelengkapans)
+                                                                        <div class="col-md-6 mb-4"> <!-- Ubah ukuran kolom menjadi col-md-4 untuk menyesuaikan modal besar -->
+                                                                            <div class="card border">
+                                                                                <div class="card-header text-center">
+                                                                                    <h5><strong>{{ $namaFormulir ?? 'Formulir Tidak Ditemukan' }}</strong></h5>
+                                                                                </div>
+                                                                                <div class="card-body text-center">
+                                                                                    @foreach ($kelengkapans as $kelengkapan)
+                                                                                    <p>{{ $kelengkapan['isi'] ?? 'Isi Formulir Tidak Ditemukan' }}</p>
+                                                                                    @endforeach
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        @if ($loop->iteration % 2 == 0) <!-- Sesuaikan dengan jumlah kolom baru -->
+                                                                    </div>
+                                                                    <div class="row justify-content-center">
+                                                                        @endif
+                                                                        @endforeach
+                                                                    </div>
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                                                                    <!-- Tambahkan tombol atau form untuk aksi lain jika diperlukan -->
                                                                 </div>
                                                             </div>
                                                         </div>

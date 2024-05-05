@@ -37,7 +37,7 @@
                                                         <td>
                                                             <div class="action-buttons btn-toolbar d-flex justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
                                                                 <div class="btn-group" role="group" aria-label="First group">
-                                                                    <a href="{{ route('admin.hasil.pdf', ['analisis_id' => $analisis->first()->id]) }}" class="btn btn-success">
+                                                                    <a href="{{ route('admin.hasil.pdf', ['analisis_id' => $data->id]) }}" class="btn btn-success">
                                                                         <i class="fa fa-print"></i> Cetak
                                                                     </a>
                                                                 </div>
