@@ -7,7 +7,7 @@
         <div class="row">
           <div class="col-12 col-xl-8 mb-4 mb-xl-0">
             <h3 class="font-weight-bold">Welcome {{ session('username') }}</h3>
-            <h6 class="font-weight-normal mb-0">Hampir Sempurna, Kelengkapan Sudah Mencapai <span class="text-primary">{{ $persentaseKuantitatifKeseluruhan }}%</span>. Ayo Tingkatkan</h6>
+            <h6 class="font-weight-normal mb-0">Hampir Sempurna, Kelengkapan Sudah Mencapai <span class="text-primary">jj</span>. Ayo Tingkatkan</h6>
           </div>
           <div class="col-12 col-xl-4">
             <div class="justify-content-end d-flex">
@@ -127,8 +127,9 @@
       <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Kualitatif</h4>
-            <canvas id="areaChart"></canvas>
+            <div id="kualitatifChartContainer">
+              {!! $KualitatifChart->container() !!}
+            </div>
           </div>
         </div>
       </div>
@@ -138,14 +139,6 @@
       <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Kuantitatif</h4>
-            <div class="mb-3">
-              <select class="form-control" id="timeFrameSelect" onchange="updateChart(this.value)">
-                <option value="daily">Harian</option>
-                <option value="monthly" selected>Bulanan</option>
-                <option value="yearly">Tahunan</option>
-              </select>
-            </div>
             <div id="kuantitatifChartContainer">
               {!! $KuantitatifChart->container() !!}
             </div>
@@ -159,4 +152,6 @@
 </div>
 <script src="{{ $KuantitatifChart->cdn() }}"></script>
 {{ $KuantitatifChart->script() }}
+<script src="{{ $KualitatifChart->cdn() }}"></script>
+{{ $KualitatifChart->script() }}
 @endsection

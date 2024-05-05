@@ -40,17 +40,20 @@ class FormulirController extends Controller
 
     public function deleteformulir($id)
     {
-        $formulir = Formulir::findOrFail($id);
+        $formulir = Formulir::find($id);
+
         if (!$formulir) {
             return redirect()->back()->with('error', 'Formulir tidak ditemukan');
         }
 
+        // Hapus semua isi formulir terlebih dahulu
         $formulir->isiForms()->delete();
+
+        // Setelah itu, baru hapus formulir
         $formulir->delete();
 
         return redirect()->back()->with('danger', 'Formulir berhasil dihapus');
     }
-
 
     public function someMethod()
     {

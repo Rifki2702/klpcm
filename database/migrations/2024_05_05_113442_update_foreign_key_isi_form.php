@@ -10,7 +10,7 @@ class UpdateForeignKeyIsiForm extends Migration
     {
         Schema::table('isi_form', function (Blueprint $table) {
             $table->dropForeign(['formulir_id']);
-            $table->foreign('formulir_id')->references('id')->on('formulirs')->onDelete('cascade');
+            $table->foreign('formulir_id')->references('id')->on('formulir')->onDelete('cascade');
         });
     }
 
@@ -18,7 +18,7 @@ class UpdateForeignKeyIsiForm extends Migration
     {
         Schema::table('isi_form', function (Blueprint $table) {
             $table->dropForeign(['formulir_id']);
-            $table->foreign('formulir_id')->references('id')->on('formulirs');
+            $table->foreign('formulir_id')->references('id')->on('formulir');
         });
     }
 }

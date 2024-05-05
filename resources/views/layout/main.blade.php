@@ -92,7 +92,7 @@
                             <img src="{{ asset('storage/foto-user/'.Auth::user()->image) }}" alt="{{ Auth::user()->name }}" />
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                            <a class="dropdown-item">
+                            <a href="{{ route('admin.editprofile', Auth::user()->id) }}" class="dropdown-item">
                                 <i class="fas fa-user text-primary"></i>
                                 Edit Profile
                             </a>
@@ -113,7 +113,7 @@
             <!-- partial:partials/_sidebar.html -->
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
                 <ul class="nav">
-                    <li class="nav-item {{ Request::is('admin.dashboard') ? 'active' : '' }}">
+                    <li class="nav-item {{ Request::is('admin/dashboard', 'admin/editprofile/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.dashboard') }}">
                             <i class="fas fa-th-large menu-icon"></i>
                             <span class="menu-title">Dashboard</span>

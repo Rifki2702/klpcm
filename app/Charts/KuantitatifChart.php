@@ -3,69 +3,61 @@
 namespace App\Charts;
 
 use ArielMejiaDev\LarapexCharts\LarapexChart;
-use App\Models\Analisis;
+use App\Models\Kelengkapan;
 use Carbon\Carbon;
 
 class KuantitatifChart
 {
     protected $chart;
 
-    public function __construct(LarapexChart $chart)
+    public function __construct()
     {
-        $this->chart = $chart;
+        $this->chart = new LarapexChart();
     }
 
-    public function build(string $timeFrame = 'monthly'): \ArielMejiaDev\LarapexCharts\AreaChart
+    public function build()
     {
-        $title = 'Kuantitatif';
-        $subtitle = 'Persentase Kelengkapan Kuantitatif';
-        $xAxis = [];
+        $title = 'Kuantitatif Harian';
+        $subtitle = 'Persentase Kelengkapan Kuantitatif Harian';
+        $xAxis = []; // Array untuk menyimpan nama hari atau tanggal
         $dataPersentaseKuantitatif = [];
 
-        switch ($timeFrame) {
-            case 'daily':
-                $title .= ' Harian';
-                $subtitle .= ' Harian';
-                $xAxis = range(1, 7); // Data harian selama satu minggu
-                break;
-            case 'monthly':
-                $title .= ' Bulanan';
-                $subtitle .= ' Bulanan';
-                $xAxis = range(1, 6); // Data bulanan selama 6 bulan
-                break;
-            case 'yearly':
-                $title .= ' Tahunan';
-                $subtitle .= ' Tahunan';
-                $xAxis = range(Carbon::now()->year - 4, Carbon::now()->year); // Data tahunan selama 5 tahun
-                break;
-        }
-
-        $analisis = Analisis::all(); // Mengambil semua data analisis
+        $kelengkapan = Kelengkapan::all(); // Mengambil semua data kelengkapan
 
         // Looping untuk menghitung persentase kuantitatif
-        foreach ($xAxis as $index => $label) {
-            $dataPersentaseKuantitatif[$index] = $analisis->filter(function ($analisis) use ($label) {
-                // Pastikan bahwa 'tglcek' adalah instance dari Carbon sebelum memformat
-                if ($analisis->tglcek instanceof Carbon) {
-                    return $analisis->tglcek->format('m') == $label;
-                }
-                return false;
-            })->avg('persentase_kuantitatif');
+        foreach ($kelengkapan as $kelengkapanItem) {
+            $tglCek = Carbon::parse($kelengkapanItem->tglcek);
+            $namaHari = $tglCek->isoFormat('dddd'); // Mengambil nama hari dari tglcek
+            $tanggal = $tglCek->format('d M'); // Mengambil tanggal dari tglcek
+
+            $label = "$namaHari, $tanggal";
+
+            if (!in_array($label, $xAxis)) {
+                $xAxis[] = $label;
+                $index = array_search($label, $xAxis);
+
+                $kelengkapanHarian = $kelengkapan->filter(function ($kelengkapan) use ($tglCek) {
+                    return Carbon::parse($kelengkapan->tglcek)->isSameDay($tglCek);
+                });
+
+                // Hitung jumlah kelengkapan harian dan jumlah kelengkapan kuantitatif
+                $jumlahKelengkapanHarian = $kelengkapanHarian->count();
+                $jumlahKuantitatifHarian = $kelengkapanHarian->where('kuantitatif', true)->count();
+
+                // Hitung persentase kuantitatif harian
+                $persentaseKuantitatif = $jumlahKelengkapanHarian > 0 ? round(($jumlahKuantitatifHarian / $jumlahKelengkapanHarian) * 100, 2) : 0;
+                $dataPersentaseKuantitatif[$index] = $persentaseKuantitatif;
+            }
         }
 
-        // Buat chart baru menggunakan LarapexChart
-        $chart = new LarapexChart();
-
-        // Atur tipe sumbu x sesuai dengan pilihan waktu
-        $xAxisType = $timeFrame === 'yearly' ? 'datetime' : 'category';
-
-        return $chart->areaChart()
+        // Gunakan objek chart yang sudah disiapkan
+        return $this->chart->areaChart()
             ->setTitle($title)
             ->setSubtitle($subtitle)
             ->addData('Persentase Kelengkapan', $dataPersentaseKuantitatif)
             ->setXAxis([
                 'categories' => $xAxis,
-                'type' => $xAxisType,
+                'type' => 'category',
             ]);
     }
 }
