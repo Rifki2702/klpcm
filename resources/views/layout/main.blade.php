@@ -63,26 +63,45 @@
                             @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-                            <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-                            <div class="notification-list" style="max-height: 200px; overflow-y: auto;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="font-weight-bold">Notifications</h4>
+                                </div>
+                            </div>
+                            <div class="notification-list" style="max-height: 200px; overflow-y: auto; width:100%">
                                 @foreach(auth()->user()->notifications as $notification)
                                 @php
-                                $isComplete = $notification->data['is_complete'] ?? false;
+                                $isComplete = $notification->data['is_complete'];
                                 $bgColor = $isComplete ? 'bg-success' : 'bg-warning';
                                 @endphp
-                                <div class="dropdown-item preview-item @if(!$notification->read_at) unread @endif">
-                                    <div class="preview-thumbnail">
-                                        <div class="preview-icon {{ $bgColor }}">
-                                            <i class="ti-info-alt mx-0"></i>
+                                {{--  --}}
+                                <a href="{{ $notification->data['link'] }}" style="text-decoration: none" id="notification-read">
+                                    <div class="dropdown-item preview-item @if(!$notification->read_at) unread @endif">
+                                        <div class="preview-thumbnail">
+                                            <div class="preview-icon {{ $bgColor }}">
+                                                <i class="ti-info-alt mx-0"></i>
+                                            </div>
+                                        </div>
+                                        <div class="preview-item-content">
+                                            <h6 class="preview-subject font-weight-normal">{{ $notification->data['message'] }}</h6>
+                                            <div class="d-flex justify-content-between" style="
+                                                display: flex;
+                                                justify-content: space-around;
+                                            ">
+                                                <div style="width: 500px">
+                                                    <p class="font-weight-light small-text mb-0 text-muted">
+                                                        {{ $notification->created_at->diffForHumans() }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p class="font-weight-light small-text mb-0 text-muted">
+                                                        Kelengkapan data : <b class="font-weight-bold">{{ isset($notification->data['analisis']) ? $notification->data['analisis'] : '0%' }}</b>
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="preview-item-content">
-                                        <h6 class="preview-subject font-weight-normal">{{ $notification->data['message'] }}</h6>
-                                        <p class="font-weight-light small-text mb-0 text-muted">
-                                            {{ $notification->created_at->diffForHumans() }}
-                                        </p>
-                                    </div>
-                                </div>
+                                </a>
                                 @endforeach
                             </div>
                         </div>
@@ -226,6 +245,21 @@
         }
     </script>
     <script>
+        $('#notification-read').on('click',function() {
+            let id = `{{ Auth::user()->id }}`
+            $.ajax({
+                url: "{{ route('notifications.markAsRead') }}",
+                type: 'GET',
+                data:{
+                    id:id
+                },
+                success:function(data) {
+                    console.log(data);
+                }
+            })
+        })
+    </script>
+    {{-- <script>
         // Menghilangkan jumlah notifikasi setelah diklik
         document.addEventListener('DOMContentLoaded', function() {
             var countElement = document.getElementById('notification-count');
@@ -237,7 +271,7 @@
                 });
             }
         });
-    </script>
+    </script> --}}
 
     <!-- End custom js for this page-->
 </body>

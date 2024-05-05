@@ -6,6 +6,7 @@ use App\Http\Controllers\DokterController;
 use App\Http\Controllers\FormulirController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RMController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,4 +71,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::get('/laporan/filter', [LaporanController::class, 'laporanmanagement'])->name('laporanfilter');
     Route::get('/laporan/pdf', [LaporanController::class, 'downloadPDF'])->name('laporanpdf');
     Route::get('/laporan/excel', [LaporanController::class, 'downloadExcel'])->name('laporanexcel');
+
 });
+// NOTIFICATION READ
+Route::get('/notification', [NotificationController::class, 'markRead'])->name('notifications.markAsRead');

@@ -11,11 +11,11 @@ class KelengkapanNotification extends Notification
 {
     use Queueable;
 
-    protected $message;
+    protected $data;
 
-    public function __construct($message)
+    public function __construct($data)
     {
-        $this->message = $message;
+        $this->data = $data;
     }
 
     public function via($notifiable)
@@ -26,8 +26,10 @@ class KelengkapanNotification extends Notification
     public function toDatabase($notifiable)
     {
         return [
-            'message' => $this->message,
-            'link' => route('admin.viewklpcm'),
+            'message' => $this->data['message'],
+            'is_complete' => $this->data['is_complete'],
+            'link' => $this->data['link'],
+            'analisis'=> $this->data['analisis'],
         ];
     }
 }
