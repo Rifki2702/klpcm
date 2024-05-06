@@ -108,7 +108,7 @@
                     </li>
                     <li class="nav-item nav-profile dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-                            <img src="{{ asset('storage/foto-user/'.Auth::user()->image) }}" alt="{{ Auth::user()->name }}" />
+                            <img src="{{ Auth::user()->image != null ? asset('storage/user/'.Auth::user()->image) : asset('skydash/images/faces/face21.jpg') }}" alt="{{ Auth::user()->name }}" />
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
                             <a href="{{ route('admin.editprofile', Auth::user()->id) }}" class="dropdown-item">

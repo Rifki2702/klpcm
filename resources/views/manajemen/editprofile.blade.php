@@ -9,7 +9,7 @@
                         <div class="card-body text-center">
                             <img src="{{ asset('path_to_image') }}" class="rounded-circle" width="150" alt="Profil">
                             <h3>{{ Auth::user()->name }}</h3>
-                            <p>{{ Auth::user()->role->name }}</p>
+                            <p>{{ Auth::user()->roles->first()->name }}</p>
                             <p>Email: {{ Auth::user()->email }}</p>
                         </div>
                     </div>

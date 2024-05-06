@@ -9,11 +9,14 @@ use App\Models\Formulir;
 use App\Models\Kelengkapan;
 use App\Models\User;
 use App\Models\Pasien;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -75,31 +78,44 @@ class DashboardController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'gender' => 'required|in:Laki-laki,Perempuan',
             'password' => 'nullable|string|min:8',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
         }
+        try {
+            $data = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'gender' => $request->gender,
+            ];
 
-        $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'gender' => $request->gender,
-        ];
+            $user = User::find($id);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->gender = $request->gender;
+            if ($request->password) {
+                $user->password = bcrypt($request->password);
+                $data['password'] = bcrypt($request->password);
+            }
 
-        if ($request->password) {
-            $data['password'] = bcrypt($request->password);
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = Carbon::now()->translatedFormat('his').Str::slug($request->name).'.'.$file->extension();
+                $file->storeAs('public/user/'.$filename);
+                $user->image = $filename;
+                $imagePath = $request->file('image')->store('photos', 'public');
+                $data['image'] = $imagePath;
+            }
+            $user->update();
+            // $user = User::findOrFail($id);
+            // $user->update($data);
+
+            return redirect()->route('admin.dashboard')->with('success', 'Data berhasil diperbarui');
+
+        } catch (Exception $th) {
+            return $th;
         }
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('photos', 'public');
-            $data['photo'] = $imagePath;
-        }
-
-        $user = User::findOrFail($id);
-        $user->update($data);
-
-        return redirect()->route('dashboard')->with('success', 'Data berhasil diperbarui');
     }
 }
