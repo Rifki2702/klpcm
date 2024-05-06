@@ -400,7 +400,7 @@ class RMController extends Controller
         $kualitatifs = Kualitatif::all(); // Mengambil semua data dari tabel kualitatif
         $ketepatan = Ketepatan::all();
 
-        return view('rm.analisis.analisiskualitatif', compact('analisis', 'rm_pasien', 'usersDokter', 'formulirs', 'kualitatifs', 'ketepatan'));
+        return view('rm.analisis.analisiskualitatif', compact('analisis', 'rm_pasien', 'usersDokter', 'kualitatifs', 'ketepatan'));
     }
 
     public function editkualitatif($analisis_id)

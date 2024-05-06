@@ -7,7 +7,7 @@
                 <div class="col-md-4">
                     <div class="card shadow">
                         <div class="card-body text-center">
-                            <img src="{{ asset('path_to_image') }}" class="rounded-circle" width="150" alt="Profil">
+                            <img src="{{ Auth::user()->image != null ? asset('storage/user/'.Auth::user()->image) : asset('skydash/images/faces/face21.jpg') }}" alt="{{ Auth::user()->name }}" />
                             <h3>{{ Auth::user()->name }}</h3>
                             <p>{{ Auth::user()->roles->first()->name }}</p>
                             <p>Email: {{ Auth::user()->email }}</p>

@@ -39,18 +39,6 @@
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
                     <span class="icon-menu"></span>
                 </button>
-                <ul class="navbar-nav mr-lg-2">
-                    <li class="nav-item nav-search d-none d-lg-block">
-                        <div class="input-group">
-                            <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
-                                <span class="input-group-text" id="search">
-                                    <i class="icon-search"></i>
-                                </span>
-                            </div>
-                            <input type="text" class="form-control" id="navbar-search-input" placeholder="Search now" aria-label="search" aria-describedby="search">
-                        </div>
-                    </li>
-                </ul>
                 <ul class="navbar-nav navbar-nav-right">
                     <li class="nav-item dropdown">
                         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
@@ -74,7 +62,7 @@
                                 $isComplete = $notification->data['is_complete'];
                                 $bgColor = $isComplete ? 'bg-success' : 'bg-warning';
                                 @endphp
-                                {{--  --}}
+                                {{-- --}}
                                 <a href="{{ $notification->data['link'] }}" style="text-decoration: none" id="notification-read">
                                     <div class="dropdown-item preview-item @if(!$notification->read_at) unread @endif">
                                         <div class="preview-thumbnail">
@@ -160,7 +148,7 @@
                             <span class="menu-title">Tambah Pasien</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ Request::is('admin/analisismanagement', 'admin/analisisbaru/*', 'admin/analisislama/*', 'admin/analisiskualitatif/*', 'admin/hasil/*', 'admin/pdf/*') ? 'active' : '' }}">
+                    <li class="nav-item {{ Request::is('admin/analisismanagement', 'admin/analisisbaru/*', 'admin/analisislama/*', 'admin/analisiskualitatif/*', 'admin/editkuantitatif/*', 'admin/editkualitatif/*', 'admin/hasil/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.analisismanagement') }}">
                             <i class="fas fa-search menu-icon"></i>
                             <span class="menu-title">Analisis DRM</span>
@@ -245,15 +233,15 @@
         }
     </script>
     <script>
-        $('#notification-read').on('click',function() {
+        $('#notification-read').on('click', function() {
             let id = `{{ Auth::user()->id }}`
             $.ajax({
                 url: "{{ route('notifications.markAsRead') }}",
                 type: 'GET',
-                data:{
-                    id:id
+                data: {
+                    id: id
                 },
-                success:function(data) {
+                success: function(data) {
                     console.log(data);
                 }
             })
