@@ -222,16 +222,7 @@
             });
         });
     </script>
-    <script>
-        function updateChart(timeFrame) {
-            fetch(`/dashboard/chart/${timeFrame}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('kuantitatifChartContainer').innerHTML = data.chart;
-                })
-                .catch(error => console.error('Error loading the chart:', error));
-        }
-    </script>
+
     <script>
         $('#notification-read').on('click', function() {
             let id = `{{ Auth::user()->id }}`
@@ -247,6 +238,7 @@
             })
         })
     </script>
+
     {{-- <script>
         // Menghilangkan jumlah notifikasi setelah diklik
         document.addEventListener('DOMContentLoaded', function() {
