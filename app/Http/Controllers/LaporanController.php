@@ -28,11 +28,16 @@ class LaporanController extends Controller
         $mpdf->Output($filename, 'D');
     }
 
-
     public function downloadExcel(Request $request)
     {
-        $data = $this->getData($request);
-        return Excel::download(new LaporanExport($data), 'laporan.xlsx');
+        // Ambil data analisis dengan cara yang sama seperti dalam `downloadPDF`
+        $dataAnalisis = $this->laporanmanagement($request)->getData()['dataAnalisis'];
+
+        // Buat nama file sesuai dengan format "laporan_ddmmyyyy.xlsx"
+        $filename = 'laporan_' . now()->format('dmY') . '.xlsx';
+
+        // Unduh file Excel dengan data yang sesuai
+        return Excel::download(new LaporanExport(collect($dataAnalisis)), $filename);
     }
 
     public function laporanmanagement(Request $request)

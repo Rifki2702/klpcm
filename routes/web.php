@@ -28,12 +28,14 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/editprofile/{id}', [DashboardController::class, 'editprofile'])->name('editprofile');
+    Route::put('/updateuser/{id}', [DashboardController::class, 'updateuser'])->name('updateuser');
 
     Route::get('/getchart', [DashboardController::class, 'getchart'])->name('getchart');
 
     Route::get('/usermanagement', [AdminController::class, 'usermanagement'])->name('usermanagement');
     Route::post('/insertuser', [AdminController::class, 'insertuser'])->name('insertuser');
-    Route::put('/updateuser/{id}', [AdminController::class, 'updateuser'])->name('updateuser');
+    Route::put('/edituser/{id}', [AdminController::class, 'edituser'])->name('edituser');
     Route::delete('/deleteuser/{id}', [AdminController::class, 'deleteuser'])->name('deleteuser');
 
     Route::get('/formulirmanagement', [FormulirController::class, 'formulirmanagement'])->name('formulirmanagement');
@@ -74,5 +76,3 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
 // NOTIFICATION READ
 Route::get('/notification', [NotificationController::class, 'markRead'])->name('notifications.markAsRead');
 // Update user
-Route::get('/editprofile/{id}', [DashboardController::class, 'editprofile'])->name('admin.editprofile');
-Route::put('/updateuser/{id}', [DashboardController::class, 'updateuser'])->name('admin.updateuser');

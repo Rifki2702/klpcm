@@ -171,7 +171,7 @@
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form method="POST" action="{{ route('admin.updateuser',['id' => $d->id]) }}" enctype="multipart/form-data">
+                                                    <form method="POST" action="{{ route('admin.edituser',['id' => $d->id]) }}" enctype="multipart/form-data">
                                                         @csrf
                                                         @method('PUT')
 

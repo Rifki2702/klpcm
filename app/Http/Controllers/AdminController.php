@@ -77,22 +77,7 @@ class AdminController extends Controller
         return redirect()->route('admin.usermanagement')->with('success', 'Data berhasil ditambahkan.');
     }
 
-    public function show($userId)
-    {
-        $user = User::find($userId);
-        $roleName = $user->role->name;
-
-        return view('user.show', compact('user', 'roleName'));
-    }
-
-    public function edituser($id)
-    {
-        $data = User::findOrFail($id);
-        $roles = Role::all(); // Ambil semua data peran (roles)
-        return view('admin.users.edituser', compact('data', 'roles'));
-    }
-
-    public function updateuser(Request $request, $id)
+    public function edituser(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'name'      => 'required',
