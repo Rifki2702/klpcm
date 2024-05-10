@@ -33,6 +33,7 @@
                                         <th>Nama</th>
                                         <th>Jabatan</th>
                                         <th>Email</th>
+                                        <th>Foto</th>
                                         <th>Opsi</th>
                                     </tr>
                                 </thead>
@@ -47,6 +48,7 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $d->email }}</td>
+                                        <td><img src="{{ asset('storage/foto-user/'.$d->image) }}" alt="" width="100"></td>
                                         <td>
                                             <div class="btn-group" role="group" aria-label="First group">
                                                 <button type="button" class="btn btn-warning btn-icon-text" data-toggle="modal" data-target="#modalEditUser{{ $d->id }}">

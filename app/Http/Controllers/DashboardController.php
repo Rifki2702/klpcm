@@ -102,15 +102,18 @@ class DashboardController extends Controller
 
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
-                $filename = Carbon::now()->translatedFormat('his') . Str::slug($request->name) . '.' . $file->extension();
-                $file->storeAs('public/user/' . $filename);
+                $filename = Carbon::now()->translatedFormat('his').Str::slug($request->name).'.'.$file->extension();
+                $file->storeAs('public/user/'.$filename);
                 $user->image = $filename;
                 $imagePath = $request->file('image')->store('photos', 'public');
                 $data['image'] = $imagePath;
             }
             $user->update();
+            // $user = User::findOrFail($id);
+            // $user->update($data);
 
             return redirect()->route('admin.dashboard')->with('success', 'Data berhasil diperbarui');
+
         } catch (Exception $th) {
             return $th;
         }
