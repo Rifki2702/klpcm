@@ -19,45 +19,37 @@ class KuantitatifChart
     {
         $title = 'Kuantitatif Harian';
         $subtitle = 'Persentase Kelengkapan Kuantitatif Harian';
-        $xAxis = []; // Array untuk menyimpan nama hari atau tanggal
-        $dataPersentaseKuantitatif = [];
+        $dataPersentaseKuantitatif = array_fill(0, 7, 0); // Inisialisasi array dengan 0 untuk setiap hari
 
         $kelengkapan = Kelengkapan::all(); // Mengambil semua data kelengkapan
 
         // Looping untuk menghitung persentase kuantitatif
         foreach ($kelengkapan as $kelengkapanItem) {
-            $tglCek = Carbon::parse($kelengkapanItem->tglcek);
-            $namaHari = $tglCek->isoFormat('dddd'); // Mengambil nama hari dari tglcek
-            $tanggal = $tglCek->format('d M'); // Mengambil tanggal dari tglcek
+            $hari = Carbon::parse($kelengkapanItem->tglcek)->dayOfWeek; // Mendapatkan index hari
 
-            $label = "$namaHari, $tanggal";
+            $kelengkapanHarian = $kelengkapan->filter(function ($item) use ($kelengkapanItem) {
+                return Carbon::parse($item->tglcek)->dayOfWeek === Carbon::parse($kelengkapanItem->tglcek)->dayOfWeek;
+            });
 
-            if (!in_array($label, $xAxis)) {
-                $xAxis[] = $label;
-                $index = array_search($label, $xAxis);
+            // Hitung jumlah kelengkapan harian dan jumlah kelengkapan kuantitatif
+            $jumlahKelengkapanHarian = $kelengkapanHarian->count();
+            $jumlahKuantitatifHarian = $kelengkapanHarian->where('kuantitatif', true)->count();
 
-                $kelengkapanHarian = $kelengkapan->filter(function ($kelengkapan) use ($tglCek) {
-                    return Carbon::parse($kelengkapan->tglcek)->isSameDay($tglCek);
-                });
-
-                // Hitung jumlah kelengkapan harian dan jumlah kelengkapan kuantitatif
-                $jumlahKelengkapanHarian = $kelengkapanHarian->count();
-                $jumlahKuantitatifHarian = $kelengkapanHarian->where('kuantitatif', true)->count();
-
-                // Hitung persentase kuantitatif harian
-                $persentaseKuantitatif = $jumlahKelengkapanHarian > 0 ? round(($jumlahKuantitatifHarian / $jumlahKelengkapanHarian) * 100, 2) : 0;
-                $dataPersentaseKuantitatif[$index] = $persentaseKuantitatif;
-            }
+            // Hitung persentase kuantitatif harian
+            $persentaseKuantitatif = $jumlahKelengkapanHarian > 0 ? round(($jumlahKuantitatifHarian / $jumlahKelengkapanHarian) * 100, 2) : 0;
+            $dataPersentaseKuantitatif[$hari] = $persentaseKuantitatif;
         }
+
+        // Mengubah format hari dalam $xAxis dengan deskripsi sesuai yang diminta
+        $xAxis = [
+            'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'
+        ];
 
         // Gunakan objek chart yang sudah disiapkan
         return $this->chart->areaChart()
             ->setTitle($title)
             ->setSubtitle($subtitle)
-            ->addData('Persentase Kelengkapan', $dataPersentaseKuantitatif)
-            ->setXAxis([
-                'categories' => $xAxis,
-                'type' => 'category',
-            ]);
+            ->addData('Persentase Kelengkapan', array_values($dataPersentaseKuantitatif)) // Pastikan data dalam urutan yang benar
+            ->setXAxis($xAxis);
     }
 }
