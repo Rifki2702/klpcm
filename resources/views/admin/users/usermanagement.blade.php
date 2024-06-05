@@ -171,10 +171,9 @@
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form method="POST" action="{{ route('admin.updateuser',['id' => $d->id]) }}" enctype="multipart/form-data">
+                                                    <form method="POST" action="{{ route('admin.edituser',['id' => $d->id]) }}" enctype="multipart/form-data">
                                                         @csrf
                                                         @method('PUT')
-
                                                         <div class="form-group row">
                                                             <label for="name" class="col-sm-2 col-form-label text-left">Nama Petugas</label>
                                                             <label class="col-sm-1 col-form-label text-left">:</label>

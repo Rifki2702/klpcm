@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Analisis;
+use App\Models\Dokter;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -140,5 +141,63 @@ class AdminController extends Controller
         $user->delete();
 
         return redirect()->route('admin.usermanagement')->with('danger', 'Data berhasil dihapus.');
+    }
+
+    public function doktermanagement()
+    {
+        $dokter = Dokter::all();
+        return view('admin.dokter.doktermanagement', compact('dokter'));
+    }
+    public function insertdokter(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama_dokter' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
+        $dokter = new Dokter();
+        $dokter->nama_dokter = $request->nama_dokter;
+        $dokter->save();
+
+        return redirect()->route('admin.doktermanagement')->with('success', 'Dokter berhasil ditambahkan.');
+    }
+
+    public function editdokter(Request $request, $id)
+    {
+        // Debugging line to check the ID
+        if (is_null($id)) {
+            return redirect()->back()->with('error', 'ID Dokter tidak ditemukan.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama_dokter' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
+        // Ensure that $dokter is a single model instance
+        $dokter = Dokter::findOrFail($id); // This ensures $dokter is a model, not a collection
+        $dokter->nama_dokter = $request->nama_dokter;
+        $dokter->save();
+
+        return redirect()->route('admin.doktermanagement')->with('warning', 'Data dokter berhasil diupdate.');
+    }
+
+    public function deletedokter($id)
+    {
+        $dokter = Dokter::find($id);
+
+        if (!$dokter) {
+            return redirect()->route('admin.doktermanagement')->with('danger', 'Dokter tidak ditemukan.');
+        }
+
+        $dokter->delete();
+
+        return redirect()->route('admin.doktermanagement')->with('danger', 'Dokter berhasil dihapus.');
     }
 }

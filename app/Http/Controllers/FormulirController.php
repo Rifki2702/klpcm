@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Formulir;
 use App\Models\IsiForm;
+use App\Models\Kelengkapan;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class FormulirController extends Controller
 {
@@ -40,19 +43,33 @@ class FormulirController extends Controller
 
     public function deleteformulir($id)
     {
-        $formulir = Formulir::find($id);
+        // return $formulir;
+        try {
+            $isi = IsiForm::where('formulir_id', $id)->get();
+            foreach ($isi as $item) {
+                $kelengkapan = Kelengkapan::where('isi_form_id', $item->id)->first();
+                if ($kelengkapan) $kelengkapan->delete();
+            }
+            IsiForm::where('formulir_id', $id)->delete();
+            Formulir::destroy($id);
+            DB::commit();
+            return redirect()->back()->with('danger', 'Formulir berhasil dihapus');
 
-        if (!$formulir) {
-            return redirect()->back()->with('error', 'Formulir tidak ditemukan');
+        } catch (Exception $th) {
+            DB::rollBack();
+            return $th;
         }
 
-        // Hapus semua isi formulir terlebih dahulu
-        $formulir->isiForms()->delete();
+        // if (!$formulir) {
+        //     return redirect()->back()->with('error', 'Formulir tidak ditemukan');
+        // }
 
-        // Setelah itu, baru hapus formulir
-        $formulir->delete();
+        // // Hapus semua isi formulir terlebih dahulu
+        // $formulir->isiForms()->delete();
 
-        return redirect()->back()->with('danger', 'Formulir berhasil dihapus');
+        // // Setelah itu, baru hapus formulir
+        // $formulir->delete();
+
     }
 
     public function someMethod()

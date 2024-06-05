@@ -2,11 +2,11 @@
 
 namespace App\Charts;
 
-use ArielMejiaDev\LarapexCharts\LarapexChart;
 use App\Models\Kelengkapan;
+use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Carbon\Carbon;
 
-class KuantitatifChart
+class LengkapTepatChart
 {
     protected $chart;
 
@@ -15,10 +15,8 @@ class KuantitatifChart
         $this->chart = new LarapexChart();
     }
 
-    public function build()
+    public function build(): \ArielMejiaDev\LarapexCharts\AreaChart
     {
-        $title = 'Kuantitatif Harian';
-        $subtitle = 'Persentase Kelengkapan Kuantitatif Harian';
         $dataPersentaseKuantitatif = array_fill(0, 7, 0); // Inisialisasi array dengan 0 untuk setiap hari
 
         $tanggalMulai = Carbon::now()->subDays(6); // Mulai dari 7 hari yang lalu
@@ -47,12 +45,11 @@ class KuantitatifChart
             $persentaseKuantitatif = $jumlahKelengkapanHarian > 0 ? round(($jumlahKuantitatifHarian / $jumlahKelengkapanHarian) * 100, 2) : 0;
             $dataPersentaseKuantitatif[$index] = $persentaseKuantitatif;
         }
-
-        // Gunakan objek chart yang sudah disiapkan
         return $this->chart->areaChart()
-            ->setTitle($title)
-            ->setSubtitle($subtitle)
-            ->addData('Persentase Kelengkapan', array_values($dataPersentaseKuantitatif)) // Pastikan data dalam urutan yang benar
+            ->setTitle('Rekam Medis')
+            ->setSubtitle('Kelengkapan dan Ketepatan')
+            ->addData('Persentase Kelengkapan', array_values($dataPersentaseKuantitatif))
+            ->addData('Ketepatan', [70, 29, 77, 28, 55, 45])
             ->setXAxis($xAxis);
     }
 }

@@ -11,6 +11,7 @@ use App\Models\Kualitatif;
 use Illuminate\Http\Request;
 use App\Models\Pasien;
 use App\Models\User;
+use App\Models\Dokter;
 use App\Notifications\KelengkapanNotification;
 use Exception;
 use Mpdf\Mpdf;
@@ -133,9 +134,10 @@ class RMController extends Controller
 
     public function analisislama($id)
     {
-        $usersDokter = User::whereHas('roles', function ($query) {
-            $query->where('name', 'dokter');
+        $usersRuangan = User::whereHas('roles', function ($query) {
+            $query->where('name', 'ruangan');
         })->get();
+        $dokter = Dokter::all();
 
         $pasien = Pasien::findOrFail($id);
 
@@ -185,28 +187,28 @@ class RMController extends Controller
         }
 
         // Kirim data ke view
-        return view('rm.analisis.analisislama', compact('analisis', 'hasilJumlahKuantitatif', 'hasilJumlahKualitatif', 'pasien', 'usersDokter'));
+        return view('rm.analisis.analisislama', compact('analisis', 'hasilJumlahKuantitatif', 'hasilJumlahKualitatif', 'pasien', 'usersRuangan', 'dokter'));
     }
 
     public function analisisbaru($analisis_id)
     {
         $analisis = Analisis::findOrFail($analisis_id);
         $rm_pasien = $analisis->pasien->rm;
+        $dokter = Dokter::all();
 
-        $usersDokter = User::whereHas('roles', function ($query) {
-            $query->where('name', 'dokter');
+        $usersRuangan = User::whereHas('roles', function ($query) {
+            $query->where('name', 'ruangan');
         })->get();
 
         $formulirs = Formulir::whereDoesntHave('kelengkapans', function ($query) use ($analisis_id) {
             $query->where('analisis_id', $analisis_id);
         })->get();
 
-        // Untuk menghindari terlalu banyak pengalihan, kita akan mengembalikan view langsung jika formulir kosong tanpa melakukan redirect
         if ($formulirs->isEmpty()) {
             return view('rm.analisis.hasil', ['analisis_id' => $analisis_id])->with('warning', 'Tidak ada formulir yang tersedia.');
         }
 
-        return view('rm.analisis.analisisbaru', compact('rm_pasien', 'usersDokter', 'formulirs', 'analisis'));
+        return view('rm.analisis.analisisbaru', compact('rm_pasien', 'usersRuangan', 'formulirs', 'analisis', 'dokter'));
     }
 
     public function insertawal(Request $request)
@@ -214,13 +216,15 @@ class RMController extends Controller
         // Validasi data
         $validatedData = $request->validate([
             'tanggal' => 'required|date',
-            'dokter' => 'required|exists:users,id',
+            'ruangan' => 'required|exists:users,id',
+            'dokter_id' => 'required|exists:dokters,id', // Perbaiki nama field validasi untuk dokter_id
         ]);
 
         // Simpan data ke dalam tabel analisis
         $analisis = new Analisis;
-        $analisis->user_id = $request->input('dokter'); // Isi user_id dengan ID dokter yang dipilih
+        $analisis->user_id = $request->input('ruangan'); // Isi user_id dengan ID ruangan yang dipilih
         $analisis->pasien_id = $request->input('pasien_id');
+        $analisis->dokter_id = $request->input('dokter_id'); // Gunakan input dokter_id yang telah divalidasi
         $analisis->tglberkas = $request->input('tanggal');
         $analisis->tglcek = now();
 
@@ -340,8 +344,8 @@ class RMController extends Controller
         $analisis = Analisis::findOrFail($analisis_id);
         $rm_pasien = $analisis->pasien->rm;
 
-        $usersDokter = User::whereHas('roles', function ($query) {
-            $query->where('name', 'dokter');
+        $usersRuangan = User::whereHas('roles', function ($query) {
+            $query->where('name', 'ruangan');
         })->get();
 
         $formulirs = Formulir::with(['isiForms' => function ($query) use ($analisis_id) {
@@ -350,7 +354,7 @@ class RMController extends Controller
             }]);
         }])->get();
 
-        return view('rm.analisis.edit.editkuantitatif', compact('rm_pasien', 'usersDokter', 'formulirs', 'analisis'));
+        return view('rm.analisis.edit.editkuantitatif', compact('rm_pasien', 'usersRuangan', 'formulirs', 'analisis'));
     }
 
     public function updateform(Request $request)
@@ -395,12 +399,14 @@ class RMController extends Controller
     public function analisiskualitatif($analisisId)
     {
         $analisis = Analisis::findOrFail($analisisId);
+        $usersRuangan = User::whereHas('roles', function ($query) {
+            $query->where('name', 'ruangan');
+        })->get();
         $rm_pasien = $analisis->pasien->rm;
-        $usersDokter = User::where('role_id', 3)->get(); // Assuming 3 is the role_id for dokter
         $kualitatifs = Kualitatif::all(); // Mengambil semua data dari tabel kualitatif
         $ketepatan = Ketepatan::all();
 
-        return view('rm.analisis.analisiskualitatif', compact('analisis', 'rm_pasien', 'usersDokter', 'formulirs', 'kualitatifs', 'ketepatan'));
+        return view('rm.analisis.analisiskualitatif', compact('analisis', 'rm_pasien', 'usersRuangan', 'kualitatifs', 'ketepatan'));
     }
 
     public function editkualitatif($analisis_id)
@@ -408,14 +414,14 @@ class RMController extends Controller
         $analisis = Analisis::findOrFail($analisis_id);
         $rm_pasien = $analisis->pasien->rm;
 
-        $usersDokter = User::whereHas('roles', function ($query) {
-            $query->where('name', 'dokter');
+        $usersRuangan = User::whereHas('roles', function ($query) {
+            $query->where('name', 'ruangan');
         })->get();
 
         // Ambil data Ketepatan yang terkait dengan analisis_id
         $ketepatans = Ketepatan::where('analisis_id', $analisis_id)->with('kualitatif')->get();
 
-        return view('rm.analisis.edit.editkualitatif', compact('rm_pasien', 'usersDokter', 'ketepatans', 'analisis'));
+        return view('rm.analisis.edit.editkualitatif', compact('rm_pasien', 'usersRuangan', 'ketepatans', 'analisis'));
     }
 
     public function insertkualitatif(Request $request)
@@ -451,43 +457,53 @@ class RMController extends Controller
 
     public function hasil($analisisId)
     {
-        // Ambil data analisis dari database termasuk data dokter, pasien, dan kelengkapan yang tidak lengkap (kuantitatif = 0)
-        $analisis = Analisis::with(['user', 'pasien', 'kelengkapans' => function ($query) {
-            $query->where('kuantitatif', 0)->with('formulir', 'isiForm');
-        }])->find($analisisId);
+        // Ambil data analisis dari database termasuk data dokter, pasien, dan semua kelengkapan
+        $analisis = Analisis::with(['user', 'pasien', 'kelengkapans', 'ketepatans', 'dokter'])->find($analisisId);
 
         // Pastikan data analisis ditemukan
         if (!$analisis) {
             abort(404, 'Analisis tidak ditemukan.');
         }
 
+        // Hitung jumlah kuantitatif yang memiliki nilai boolean 1
+        $jumlahKuantitatif = $analisis->kelengkapans->where('kuantitatif', true)->count();
+
+        // Hitung persentase kelengkapan kuantitatif
+        $persentaseKuantitatif = count($analisis->kelengkapans) > 0 ? round(($jumlahKuantitatif / count($analisis->kelengkapans)) * 100, 2) : 0;
+
+        // Hitung jumlah kualitatif yang memiliki nilai boolean 1
+        $jumlahKualitatif = $analisis->ketepatans->where('ketepatan', true)->count();
+
+        // Hitung persentase ketepatan kualitatif
+        $persentaseKualitatif = count($analisis->ketepatans) > 0 ? round(($jumlahKualitatif / count($analisis->ketepatans)) * 100, 2) : 0;
+
         // Kirim data ke view
-        return view('rm.analisis.hasil', compact('analisis'));
+        return view('rm.analisis.hasil', compact('analisis', 'persentaseKuantitatif', 'persentaseKualitatif'));
     }
 
     public function pdf($analisisId)
     {
-        // Ambil data analisis dari database termasuk data dokter, pasien, dan kelengkapan yang tidak lengkap (kuantitatif = 0)
-        $analisis = Analisis::with(['user', 'pasien', 'kelengkapans' => function ($query) {
-            $query->where('kuantitatif', 0)->with('formulir', 'isiForm');
-        }])->find($analisisId);
+        // Ambil data analisis dari database termasuk data dokter, pasien, dan semua kelengkapan
+        $analisis = Analisis::with(['user', 'pasien', 'kelengkapans', 'ketepatans', 'dokter'])->find($analisisId);
 
         // Pastikan data analisis ditemukan
         if (!$analisis) {
             abort(404, 'Analisis tidak ditemukan.');
         }
 
-        // Buat objek MPDF
-        $mpdf = new \Mpdf\Mpdf();
+        // Hitung jumlah kuantitatif yang memiliki nilai boolean 1
+        $jumlahKuantitatif = $analisis->kelengkapans->where('kuantitatif', true)->count();
 
-        // Tambahkan konten PDF dengan menggunakan data analisis
-        $html = view('rm.analisis.pdf', compact('analisis'))->render();
-        $mpdf->WriteHTML($html);
+        // Hitung persentase kelengkapan kuantitatif
+        $persentaseKuantitatif = count($analisis->kelengkapans) > 0 ? round(($jumlahKuantitatif / count($analisis->kelengkapans)) * 100, 2) : 0;
 
-        // Buat nama file sesuai dengan format "analisis_rm_tglberkas.pdf"
-        $filename = 'analisis_' . $analisis->pasien->rm . '_' . \Carbon\Carbon::parse($analisis->tglberkas)->format('dmY') . '.pdf';
+        // Hitung jumlah kualitatif yang memiliki nilai boolean 1
+        $jumlahKualitatif = $analisis->ketepatans->where('ketepatan', true)->count();
 
-        // Output sebagai file PDF dan langsung didownload dengan nama file yang sesuai
-        $mpdf->Output($filename, 'D');
+        // Hitung persentase ketepatan kualitatif
+        $persentaseKualitatif = count($analisis->ketepatans) > 0 ? round(($jumlahKualitatif / count($analisis->ketepatans)) * 100, 2) : 0;
+
+        // Kirim data ke view
+        return view('rm.analisis.pdf', compact('analisis', 'persentaseKuantitatif', 'persentaseKualitatif'));
     }
 }

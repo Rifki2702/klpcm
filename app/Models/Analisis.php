@@ -45,4 +45,8 @@ class Analisis extends Model
     {
         return $this->hasMany(Formulir::class);
     }
+    public function dokter()
+    {
+        return $this->belongsTo(Analisis::class);
+    }
 }

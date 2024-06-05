@@ -21,21 +21,35 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="dokter" class="col-sm-2 col-form-label">Dokter</label>
+                                        <label for="ruangan" class="col-sm-2 col-form-label">Ruangan</label>
                                         <label class="col-sm-1 col-form-label text-center">:</label>
                                         <div class="col-sm-9">
-                                            <select id="dokter" class="form-control" name="dokter" required disabled>
-                                                <option value="">Pilih Dokter</option>
-                                                @foreach($usersDokter as $user)
+                                            <select id="ruangan" class="form-control" name="ruangan" required disabled>
+                                                <option value="">Pilih Ruangan</option>
+                                                @foreach($usersRuangan as $user)
                                                 <option value="{{ $user->id }}" {{ isset($analisis) && $analisis->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="form-group row">
+                                        <label for="dokter" class="col-sm-2 col-form-label">Dokter</label>
+                                        <label class="col-sm-1 col-form-label text-center">:</label>
+                                        <div class="col-sm-9">
+                                            <select id="dokter" class="form-control" name="dokter" required disabled>
+                                                <option value="">Pilih Dokter</option>
+                                                @foreach($dokter as $dok)
+                                                <option value="{{ $dok->id }}" {{ isset($analisis) && $analisis->dokter_id == $dok->id ? 'selected' : '' }}>{{ $dok->nama_dokter }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     @foreach($formulirs as $formulir)
-                                    <div class="card mb-2" style="border: 1px solid #ccc;"> <!-- Menambahkan border pada card dan margin bottom 2 -->
+                                    <div class="card mb-2" style="border: 1px solid #ccc;">
                                         <div class="card-header">
                                             Formulir {{ $formulir->nama_formulir }}
+                                            <button type="button" onclick="selectAll('lengkap', {{ $formulir->id }});" class="btn btn-sm btn-success">Pilih Semua Lengkap</button>
+                                            <button type="button" onclick="selectAll('tidaklengkap', {{ $formulir->id }});" class="btn btn-sm btn-danger">Pilih Semua Tidak Lengkap</button>
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive table-striped" style="text-align: center; overflow-x: hidden;">
@@ -57,13 +71,13 @@
                                                                     <div class="col d-flex justify-content-center">
                                                                         <div class="form-check form-check-inline">
                                                                             <label class="form-check-label" for="lengkap{{ $isiForm->id }}">
-                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="lengkap{{ $isiForm->id }}" value="1">
+                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="lengkap{{ $isiForm->id }}" value="1" required>
                                                                                 Lengkap
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check form-check-inline">
                                                                             <label class="form-check-label" for="tidaklengkap{{ $isiForm->id }}">
-                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="tidaklengkap{{ $isiForm->id }}" value="0">
+                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="tidaklengkap{{ $isiForm->id }}" value="0" required>
                                                                                 Tidak Lengkap
                                                                             </label>
                                                                         </div>
@@ -78,7 +92,7 @@
                                         </div>
                                     </div>
                                     @endforeach
-                                    <div class="mb-4"></div> <!-- Tambahkan class mb-4 untuk memberikan margin bottom -->
+                                    <div class="mb-4"></div>
                                     <div class="form-group row">
                                         <div class="col-sm-12">
                                             <button type="submit" class="btn btn-primary">Simpan</button>
@@ -93,4 +107,15 @@
         </div>
     </div>
 </div>
+
+<script>
+    function selectAll(type, formulirId) {
+        var radios = document.querySelectorAll('input[name^="kuantitatif"]');
+        radios.forEach(function(radio) {
+            if (radio.id.startsWith(type) && radio.closest('.card').querySelector('button').onclick.toString().includes(formulirId)) {
+                radio.checked = true;
+            }
+        });
+    }
+</script>
 @endsection

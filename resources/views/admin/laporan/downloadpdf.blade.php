@@ -5,11 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KLPCM</title>
+    <!-- bootstrap css-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+        }
+
+        @media print {
+
+            .no-print,
+            .no-print * {
+                display: none !important;
+            }
+
+            /* ... the rest of the rules ... */
         }
 
         .container {
@@ -115,6 +127,11 @@
 </head>
 
 <body>
+    <div class="container">
+        <div class="d-flex justify-content-end">
+            <a href="{{ route('admin.laporanmanagement') }}" class="btn btn-primary no-print"></i> Kembali</a>
+        </div>
+    </div>
     <div class="rangkasurat">
         <table>
             <tr>
@@ -128,12 +145,12 @@
         </table>
         <div style="border-top: 4px solid black; width: 100%;"></div>
     </div>
-
     <div class="kelengkapan">
         <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
+                        <h3>Laporan Kelengkapan Berdasarkan RM</h3>
                         <div class="col-12">
                             <div class="table text-center">
                                 <table id="userTable" class="table display expandable-table" style="width:100%">
@@ -146,7 +163,7 @@
                                             <th>Tgl Analisis</th>
                                             <th>Kuantitatif (%)</th>
                                             <th>Kualitatif (%)</th>
-                                            <th>Dokter</th>
+                                            <th>Ruangan</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -182,5 +199,8 @@
         </div>
     </div>
 </body>
+<script>
+    print();
+</script>
 
 </html>

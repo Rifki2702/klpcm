@@ -19,41 +19,40 @@ class KualitatifChart
     {
         $title = 'Kualitatif Harian';
         $subtitle = 'Persentase Ketepatan Harian';
-        $xAxis = []; // Array untuk menyimpan tanggal-tanggal dari tglcek
-        $dataPersentaseKualitatif = [];
+        $dataPersentaseKualitatif = array_fill(0, 7, 0); // Inisialisasi array dengan 0 untuk setiap hari
 
-        $ketepatan = Ketepatan::all(); // Mengambil semua data ketepatan
+        $tanggalMulai = Carbon::now()->subDays(6); // Mulai dari 7 hari yang lalu
+        $ketepatan = Ketepatan::where('created_at', '>=', $tanggalMulai)->get(); // Mengambil data ketepatan dari 7 hari terakhir
+
+        // Mengubah format x-axis menjadi tanggal dari created_at
+        $xAxis = [];
+        for ($i = 0; $i < 7; $i++) {
+            $xAxis[] = Carbon::now()->subDays(6 - $i)->format('d M Y');
+        }
 
         // Looping untuk menghitung persentase kualitatif
         foreach ($ketepatan as $ketepatanItem) {
-            $tglCek = Carbon::parse($ketepatanItem->tglcek)->format('Y-m-d');
+            $tanggal = Carbon::parse($ketepatanItem->created_at)->format('d M Y'); // Mendapatkan tanggal
+            $index = array_search($tanggal, $xAxis); // Mencari index tanggal pada xAxis
 
-            if (!in_array($tglCek, $xAxis)) {
-                $xAxis[] = $tglCek;
-                $index = array_search($tglCek, $xAxis);
+            $ketepatanHarian = $ketepatan->filter(function ($item) use ($ketepatanItem) {
+                return Carbon::parse($item->created_at)->format('d M Y') === Carbon::parse($ketepatanItem->created_at)->format('d M Y');
+            });
 
-                $ketepatanHarian = $ketepatan->filter(function ($ketepatan) use ($tglCek) {
-                    return Carbon::parse($ketepatan->tglcek)->format('Y-m-d') === $tglCek;
-                });
+            // Hitung jumlah ketepatan harian dan jumlah ketepatan
+            $jumlahKetepatanHarian = $ketepatanHarian->count();
+            $jumlahKetepatan = $ketepatanHarian->where('ketepatan', true)->count();
 
-                // Hitung jumlah ketepatan harian dan jumlah ketepatan
-                $jumlahKetepatanHarian = $ketepatanHarian->count();
-                $jumlahKetepatan = $ketepatanHarian->where('ketepatan', true)->count();
-
-                // Hitung persentase kualitatif harian
-                $persentaseKualitatif = $jumlahKetepatanHarian > 0 ? round(($jumlahKetepatan / $jumlahKetepatanHarian) * 100, 2) : 0;
-                $dataPersentaseKualitatif[$index] = $persentaseKualitatif;
-            }
+            // Hitung persentase kualitatif harian
+            $persentaseKualitatif = $jumlahKetepatanHarian > 0 ? round(($jumlahKetepatan / $jumlahKetepatanHarian) * 100, 2) : 0;
+            $dataPersentaseKualitatif[$index] = $persentaseKualitatif;
         }
 
         // Gunakan objek chart yang sudah disiapkan
         return $this->chart->areaChart()
             ->setTitle($title)
             ->setSubtitle($subtitle)
-            ->addData('Persentase Ketepatan', $dataPersentaseKualitatif)
-            ->setXAxis([
-                'categories' => $xAxis,
-                'type' => 'category',
-            ]);
+            ->addData('Persentase Ketepatan', array_values($dataPersentaseKualitatif)) // Pastikan data dalam urutan yang benar
+            ->setXAxis($xAxis);
     }
 }

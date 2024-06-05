@@ -81,37 +81,50 @@
                             @csrf
                             <div class="form-group row">
                                 <label for="tglberkas" class="col-sm-4 col-form-label">Tanggal Berkas</label>
-                                <label class="col-sm-1 col-form-label text-center">:</label>
+                                <div class="col-sm-1 col-form-label text-center">:</div>
                                 <div class="col-sm-7">
                                     <input id="tglberkas" type="date" class="form-control" name="tanggal" required>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="dokter" class="col-sm-4 col-form-label">Dokter</label>
-                                <label class="col-sm-1 col-form-label text-center">:</label>
+                                <label for="ruangan" class="col-sm-4 col-form-label">Ruangan</label>
+                                <div class="col-sm-1 col-form-label text-center">:</div>
                                 <div class="col-sm-7">
-                                    <select id="dokter" class="form-control" name="dokter" required>
-                                        <option value="">Pilih Dokter</option>
-                                        @foreach($usersDokter as $user)
+                                    <select id="ruangan" class="form-control" name="ruangan" required>
+                                        <option value="">Pilih Ruangan</option>
+                                        @foreach($usersRuangan as $user)
                                         <option value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <!-- Hidden input for pasien_id -->
-                            <input type="hidden" name="pasien_id" value="{{ $pasien->id }}">
-                            <!-- Input for tglcek will be filled with current time when saving -->
-                            <input type="hidden" name="tglcek" value="{{ now()->format('Y-m-d H:i:s') }}">
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            <div class="form-group row">
+                                <label for="dokter_id" class="col-sm-4 col-form-label">Dokter</label>
+                                <div class="col-sm-1 col-form-label text-center">:</div>
+                                <div class="col-sm-7">
+                                    <select id="dokter_id" class="form-control" name="dokter_id" required>
+                                        <option value="">Pilih Dokter</option>
+                                        @foreach($dokter as $dok)
+                                        <option value="{{ $dok->id }}">{{ $dok->nama_dokter }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
-                        </form>
                     </div>
+                    <!-- Hidden input for pasien_id -->
+                    <input type="hidden" name="pasien_id" value="{{ $pasien->id }}">
+                    <!-- Input for tglcek will be filled with current time when saving -->
+                    <input type="hidden" name="tglcek" value="{{ now()->format('Y-m-d H:i:s') }}">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 </div>
 @endsection

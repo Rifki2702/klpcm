@@ -26,11 +26,15 @@
                                         <div class="col-sm-9">
                                             <select id="dokter" class="form-control" name="dokter" required disabled>
                                                 <option value="">Pilih Dokter</option>
-                                                @foreach($usersDokter as $user)
+                                                @foreach($usersRuangan as $user)
                                                 <option value="{{ $user->id }}" {{ isset($analisis) && $analisis->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <button type="button" class="btn btn-success" onclick="selectAll(true)">Tepat Semua</button>
+                                        <button type="button" class="btn btn-danger" onclick="selectAll(false)">Tidak Tepat Semua</button>
                                     </div>
                                     <div class="table-responsive table-striped" style="text-align: center; overflow-x: hidden;">
                                         <table class="table expandable-table mb-3" style="width:100%">
@@ -51,13 +55,13 @@
                                                             <div class="col d-flex justify-content-center">
                                                                 <div class="form-check form-check-inline">
                                                                     <label class="form-check-label" for="lengkap{{ $kualitatif->id }}">
-                                                                        <input type="radio" class="form-check-input" name="kualitatif[{{ $kualitatif->id }}]" id="lengkap{{ $kualitatif->id }}" value="1" {{ $kualitatif->ketepatan ? 'checked' : '' }}>
+                                                                        <input type="radio" class="form-check-input" name="kualitatif[{{ $kualitatif->id }}]" id="lengkap{{ $kualitatif->id }}" value="1" {{ $kualitatif->ketepatan ? 'checked' : '' }} required>
                                                                         Tepat
                                                                     </label>
                                                                 </div>
                                                                 <div class="form-check form-check-inline">
                                                                     <label class="form-check-label" for="tidaklengkap{{ $kualitatif->id }}">
-                                                                        <input type="radio" class="form-check-input" name="kualitatif[{{ $kualitatif->id }}]" id="tidaklengkap{{ $kualitatif->id }}" value="0" {{ $kualitatif->ketepatan ? 'checked' : '' }}>
+                                                                        <input type="radio" class="form-check-input" name="kualitatif[{{ $kualitatif->id }}]" id="tidaklengkap{{ $kualitatif->id }}" value="0" {{ $kualitatif->ketepatan ? 'checked' : '' }} required>
                                                                         Tidak Tepat
                                                                     </label>
                                                                 </div>
@@ -84,4 +88,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    function selectAll(tepat) {
+        const radioButtons = document.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            if (tepat && radio.value === "1") {
+                radio.checked = true;
+            } else if (!tepat && radio.value === "0") {
+                radio.checked = true;
+            }
+        });
+    }
+</script>
 @endsection

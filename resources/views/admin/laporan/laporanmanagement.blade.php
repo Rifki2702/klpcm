@@ -1,5 +1,31 @@
 @extends('layout.main')
+@push('js')
+<script>
+    $(document).ready(function() {
+        $('#filterWaktu').change(function() {
+            var id = $(this).val();
+            console.log(id);
+            if (id != '0') {
+                $('#bulanField').addClass('d-none');
+                $('#tahunField').addClass('d-none');
+                $('#customTanggalField').addClass('d-none');
 
+                if (id == 'bulanan') {
+                    $('#bulanField').removeClass('d-none');
+                } else if (id == 'tahunan') {
+                    $('#tahunField').removeClass('d-none');
+                } else if (id == 'custom') {
+                    $('#customTanggalField').removeClass('d-none');
+                }
+            } else {
+                $('#bulanField').addClass('d-none');
+                $('#tahunField').addClass('d-none');
+                $('#customTanggalField').addClass('d-none');
+            }
+        });
+    });
+</script>
+@endpush
 @section('content')
 <div class="main-panel">
     <div class="content-wrapper">
@@ -15,25 +41,26 @@
                                         <label class="col-sm-2 col-form-label">Filter Waktu</label>
                                         <div class="col-sm-4">
                                             <select class="form-control" id="filterWaktu" name="filter_waktu">
+                                                <option value="0" {{ request('filter_waktu') == '0' ? 'selected' : '' }}>Pilih Filter Waktu</option>
                                                 <option value="bulanan" {{ request('filter_waktu') == 'bulanan' ? 'selected' : '' }}>Bulanan</option>
                                                 <option value="tahunan" {{ request('filter_waktu') == 'tahunan' ? 'selected' : '' }}>Tahunan</option>
                                                 <option value="custom" {{ request('filter_waktu') == 'custom' ? 'selected' : '' }}>Custom Tanggal</option>
                                             </select>
                                         </div>
                                         <div class="col-sm-6">
-                                            <div class="row" id="bulanField" style="display:none;">
+                                            <div class="row d-none" id="bulanField">
                                                 <label for="bulan" class="col-sm-4 col-form-label">Bulan</label>
                                                 <div class="col-sm-8">
                                                     <input type="month" class="form-control" id="bulan" name="bulan" value="{{ request('bulan') }}">
                                                 </div>
                                             </div>
-                                            <div class="row" id="tahunField" style="display:none;">
+                                            <div class="row d-none" id="tahunField">
                                                 <label for="tahun" class="col-sm-4 col-form-label">Tahun</label>
                                                 <div class="col-sm-8">
                                                     <input type="number" class="form-control" id="tahun" name="tahun" placeholder="Masukkan Tahun" value="{{ request('tahun') }}">
                                                 </div>
                                             </div>
-                                            <div class="row" id="customTanggalField" style="display:none;">
+                                            <div class="row d-none" id="customTanggalField">
                                                 <label for="tanggalAwal" class="col-sm-4 col-form-label">Tanggal Awal</label>
                                                 <div class="col-sm-8">
                                                     <input type="date" class="form-control" id="tanggalAwal" name="tanggal_awal" value="{{ request('tanggal_awal') }}">
@@ -46,14 +73,14 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-sm-2 col-form-label">Filter Dokter</label>
+                                        <label class="col-sm-2 col-form-label">Filter Ruangan</label>
                                         <div class="col-sm-4">
-                                            <select class="form-control" id="filterDokter" name="filter_dokter">
-                                                <option value="">Semua Dokter</option>
+                                            <select class="form-control" id="filterRuangan" name="filter_ruangan">
+                                                <option value="">Semua Ruangan</option>
                                                 @foreach (\App\Models\User::whereHas('roles', function ($query) {
-                                                $query->where('name', 'dokter');
-                                                })->get() as $dokter)
-                                                <option value="{{ $dokter->id }}" {{ request('filter_dokter') == $dokter->id ? 'selected' : '' }}>{{ $dokter->name }}</option>
+                                                $query->where('name', 'ruangan');
+                                                })->get() as $ruangan)
+                                                <option value="{{ $ruangan->id }}" {{ request('filter_ruangan') == $ruangan->id ? 'selected' : '' }}>{{ $ruangan->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -67,9 +94,12 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="mb-4 text-right">
+                                        <button class="btn btn-primary">Filter</button>
+                                    </div>
                                 </form>
                                 <div class="text-left mb-3">
-                                    <a href="{{ route('admin.laporanpdf', Request::getQueryString()) }}" class="btn btn-youtube mr-1">
+                                    <a href="{{ route('admin.laporanpdf', Request::getQueryString()) }}" class="btn btn-youtube mr-1" target="_blank">
                                         PDF <i class="fas fa-file-pdf"></i>
                                     </a>
                                     <a href="{{ route('admin.laporanexcel', Request::getQueryString()) }}" class="btn btn-success">
@@ -77,13 +107,13 @@
                                     </a>
                                 </div>
                             </div>
-                            <script>
+                            {{-- <script>
                                 document.querySelectorAll('select, input').forEach(item => {
                                     item.addEventListener('change', event => {
                                         document.getElementById('filterForm').submit();
                                     });
                                 });
-                            </script>
+                            </script> --}}
                         </div>
                     </div>
                 </div>
@@ -106,7 +136,7 @@
                                                 <th>Tgl Analisis</th>
                                                 <th>Kuantitatif (%)</th>
                                                 <th>Kualitatif (%)</th>
-                                                <th>Dokter</th>
+                                                <th>Ruangan</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>

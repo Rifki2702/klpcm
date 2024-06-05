@@ -90,37 +90,6 @@
           </div>
         </div>
       </div>
-
-    </div>
-
-    @can('view_table_on_dashboard')
-
-    <div class="row">
-      <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
-          <div class="card-body">
-            <p class="card-title">Advanced Table</p>
-            <div class="row">
-              <div class="col-12">
-                <div class="table-responsive">
-                  <table id="example" class="display expandable-table" style="width:100%">
-                    <thead>
-                      <tr>
-                        <th>No</th>
-                        <th>No RM</th>
-                        <th>Tanggal Pengecekan</th>
-                        <th>LTL</th>
-                        <th>Keterangan</th>
-                        <th>Tindakan</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="row">
@@ -146,8 +115,6 @@
         </div>
       </div>
     </div>
-
-    @endcan
   </div>
 </div>
 <script src="{{ $KuantitatifChart->cdn() }}"></script>

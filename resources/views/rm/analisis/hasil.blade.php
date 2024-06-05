@@ -11,7 +11,7 @@
                             <div class="col-12">
                                 <div class="container">
                                     <div class="row mb-4">
-                                        <div class="col-md-6 text-right">
+                                        <div class="col-md-12 text-right">
                                             <p>Tanggal Berkas: {{ date('d/m/Y') }}</p>
                                         </div>
                                     </div>
@@ -19,7 +19,16 @@
                                         <div class="col-md-6">
                                             <p><strong>No RM:</strong> {{ $analisis->pasien->rm }}</p>
                                             <p><strong>Nama:</strong> {{ $analisis->pasien->name }}</p>
-                                            <p><strong>Dokter:</strong> {{ $analisis->user->name }}</p>
+                                            <p><strong>Ruangan:</strong> {{ $analisis->user->name }}</p>
+                                            <p><strong>Dokter:</strong>
+                                                @if($analisis->dokter)
+                                                {{ $analisis->dokter->nama_dokter }}
+                                                @else
+                                                Tidak ada dokter yang ditugaskan
+                                                @endif
+                                            </p>
+                                            <p><strong>Kuantitatif:</strong> {{ number_format($persentaseKuantitatif, 2) }}%</p>
+                                            <p><strong>Kualitatif:</strong> {{ number_format($persentaseKualitatif, 2) }}%</p>
                                         </div>
                                     </div>
                                     <div class="row mb-4">

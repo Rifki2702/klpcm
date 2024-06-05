@@ -27,7 +27,7 @@
                                         <div class="col-sm-9">
                                             <select id="dokter" class="form-control" name="dokter" required disabled>
                                                 <option value="">Pilih Dokter</option>
-                                                @foreach($usersDokter as $user)
+                                                @foreach($usersRuangan as $user)
                                                 <option value="{{ $user->id }}" {{ isset($analisis) && $analisis->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                                                 @endforeach
                                             </select>
@@ -37,6 +37,8 @@
                                     <div class="card mb-2" style="border: 1px solid #ccc;">
                                         <div class="card-header">
                                             Formulir {{ $formulir->nama_formulir }}
+                                            <button type="button" onclick="selectAll('lengkap', {{ $formulir->id }});" class="btn btn-sm btn-success">Pilih Semua Lengkap</button>
+                                            <button type="button" onclick="selectAll('tidaklengkap', {{ $formulir->id }});" class="btn btn-sm btn-danger">Pilih Semua Tidak Lengkap</button>
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive table-striped" style="text-align: center; overflow-x: hidden;">
@@ -58,13 +60,13 @@
                                                                     <div class="col d-flex justify-content-center">
                                                                         <div class="form-check form-check-inline">
                                                                             <label class="form-check-label" for="lengkap{{ $isiForm->id }}">
-                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="lengkap{{ $isiForm->id }}" value="1" {{ $isiForm->kelengkapan && $isiForm->kelengkapan->kuantitatif == '1' ? 'checked' : '' }}>
+                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="lengkap{{ $isiForm->id }}" value="1" {{ $isiForm->kelengkapan && $isiForm->kelengkapan->kuantitatif == '1' ? 'checked' : '' }} required>
                                                                                 Lengkap
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check form-check-inline">
                                                                             <label class="form-check-label" for="tidaklengkap{{ $isiForm->id }}">
-                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="tidaklengkap{{ $isiForm->id }}" value="0" {{ $isiForm->kelengkapan && $isiForm->kelengkapan->kuantitatif == '0' ? 'checked' : '' }}>
+                                                                                <input type="radio" class="form-check-input" name="kuantitatif[{{ $isiForm->id }}]" id="tidaklengkap{{ $isiForm->id }}" value="0" {{ $isiForm->kelengkapan && $isiForm->kelengkapan->kuantitatif == '0' ? 'checked' : '' }} required>
                                                                                 Tidak Lengkap
                                                                             </label>
                                                                         </div>
@@ -94,4 +96,15 @@
         </div>
     </div>
 </div>
+
+<script>
+    function selectAll(type, formulirId) {
+        var radios = document.querySelectorAll('input[name^="kuantitatif"]');
+        radios.forEach(function(radio) {
+            if (radio.id.startsWith(type) && radio.closest('.card').querySelector('button').onclick.toString().includes(formulirId)) {
+                radio.checked = true;
+            }
+        });
+    }
+</script>
 @endsection

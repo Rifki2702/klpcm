@@ -74,7 +74,7 @@
                                 $isComplete = $notification->data['is_complete'];
                                 $bgColor = $isComplete ? 'bg-success' : 'bg-warning';
                                 @endphp
-                                {{--  --}}
+                                {{-- --}}
                                 <a href="{{ $notification->data['link'] }}" style="text-decoration: none" id="notification-read">
                                     <div class="dropdown-item preview-item @if(!$notification->read_at) unread @endif">
                                         <div class="preview-thumbnail">
@@ -145,6 +145,12 @@
                             <span class="menu-title">Tambah User</span>
                         </a>
                     </li>
+                    <li class="nav-item {{ Request::is('admin/doktermanagement/*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.doktermanagement') }}">
+                            <i class="fas fa-user-md menu-icon"></i>
+                            <span class="menu-title">Tambah Dokter</span>
+                        </a>
+                    </li>
                     <li class="nav-item {{ Request::is('admin/formulirmanagement', 'admin/createformulir', 'admin/createisi/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.formulirmanagement') }}">
                             <i class="fas fa-file menu-icon"></i>
@@ -166,11 +172,40 @@
                             <span class="menu-title">Analisis DRM</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ Request::is('admin/laporanmanagement', 'admin/laporanfilter/*') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('admin.laporanmanagement') }}">
+                    <li class="nav-item {{ Request::is('admin/laporanmanagement', 'admin/laporankualitatif/*') ? 'active' : '' }}">
+                        <a class="nav-link" data-toggle="collapse" href="#laporanSubmenu" aria-expanded="false" aria-controls="laporanSubmenu">
                             <i class="icon-bar-graph menu-icon"></i>
                             <span class="menu-title">Laporan</span>
+                            <i class="menu-arrow"></i>
                         </a>
+                        <div class="collapse" id="laporanSubmenu">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item {{ Request::is('admin/laporanmanagement') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.laporanmanagement') }}">
+                                        <i class="icon-document menu-icon"></i>
+                                        Keseluruhan
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/laporankualitatif/*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.laporankualitatif') }}">
+                                        <i class="icon-filter menu-icon"></i>
+                                        Kualitatif
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/laporanformulir/*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.laporanformulir') }}">
+                                        <i class="icon-filter menu-icon"></i>
+                                        Formulir
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/laporangrafik/*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.laporangrafik') }}">
+                                        <i class="icon-filter menu-icon"></i>
+                                        Grafik
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
                     @endcan
 
@@ -217,6 +252,7 @@
     <script src="{{ asset('skydash/js/chart.js')}}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.min.js" integrity="sha384-Jg2f/XvOoFIoqw/i5X+TYjI2YJT0QCsNQ+0Jgy9P1kD2a8swITZcK7vjpM6dkA2t" crossorigin="anonymous"></script>
+    @stack('js')
     <script>
         $(document).ready(function() {
             $('#userTable').DataTable({
@@ -245,15 +281,15 @@
         }
     </script>
     <script>
-        $('#notification-read').on('click',function() {
+        $('#notification-read').on('click', function() {
             let id = `{{ Auth::user()->id }}`
             $.ajax({
                 url: "{{ route('notifications.markAsRead') }}",
                 type: 'GET',
-                data:{
-                    id:id
+                data: {
+                    id: id
                 },
-                success:function(data) {
+                success: function(data) {
                     console.log(data);
                 }
             })
