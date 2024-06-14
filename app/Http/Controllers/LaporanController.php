@@ -29,17 +29,8 @@ class LaporanController extends Controller
     {
         $dataAnalisis = $this->laporanmanagement($request)->getData()['dataAnalisis'];
         return view('admin.laporan.downloadpdf', compact('dataAnalisis'));
-        // $mpdf = new \Mpdf\Mpdf();
 
-        // Tambahkan konten PDF dengan menggunakan data analisis
-        // $html = view('admin.laporan.downloadpdf', compact('dataAnalisis'))->render();
-        // $mpdf->WriteHTML($html);
-
-        // Buat nama file sesuai dengan format "analisis_rm_tglberkas.pdf"
         $filename = 'laporan_' . now()->format('dmY') . '.pdf';
-
-        // Output sebagai file PDF dan langsung didownload dengan nama file yang sesuai
-        // $mpdf->Output($filename, 'D');
     }
 
     public function downloadExcel(Request $request)
@@ -98,10 +89,10 @@ class LaporanController extends Controller
                     $query->whereRaw('100 = (SELECT ROUND(AVG(CASE WHEN kuantitatif = true THEN 100 ELSE 0 END), 2) FROM kelengkapan WHERE kelengkapan.analisis_id = analisis.id)');
                 } elseif ($filterStatus == 'proses') {
                     $query->whereRaw('100 > (SELECT ROUND(AVG(CASE WHEN kuantitatif = true THEN 100 ELSE 0 END), 2) FROM kelengkapan WHERE kelengkapan.analisis_id = analisis.id)')
-                        ->whereRaw('DATEDIFF(NOW(), tglcek) < 14');
+                        ->whereRaw('DATEDIFF(NOW(), created_at) < 14');
                 } elseif ($filterStatus == 'tertunda') {
                     $query->whereRaw('100 > (SELECT ROUND(AVG(CASE WHEN kuantitatif = true THEN 100 ELSE 0 END), 2) FROM kelengkapan WHERE kelengkapan.analisis_id = analisis.id)')
-                        ->whereRaw('DATEDIFF(NOW(), tglcek) >= 14');
+                        ->whereRaw('DATEDIFF(NOW(), created_at) >= 14');
                 }
             });
         }
@@ -118,13 +109,13 @@ class LaporanController extends Controller
 
                 $status = '';
                 $hariIni = now();
-                $tglCek = \Carbon\Carbon::parse($item->tglcek);
+                $created_at = \Carbon\Carbon::parse($item->created_at);
 
                 if ($persentaseKuantitatif == 100) {
                     $status = 'complete';
                 } elseif ($persentaseKuantitatif < 100) {
                     $status = 'imr';
-                    if ($tglCek->diffInDays($hariIni) >= 7) {
+                    if ($created_at->diffInDays($hariIni) >= 7) {
                         $status = 'dmr';
                     }
                 }
@@ -175,12 +166,12 @@ class LaporanController extends Controller
         $query->whereHas('isiForms.kelengkapan', function ($query) use ($filterWaktu, $bulan, $tahun, $tanggalAwal, $tanggalAkhir) {
             if ($filterWaktu) {
                 if ($filterWaktu == 'bulanan' && $bulan) {
-                    $query->whereMonth('tglcek', '=', date('m', strtotime($bulan)))
-                        ->whereYear('tglcek', '=', date('Y', strtotime($bulan)));
+                    $query->whereMonth('created_at', '=', date('m', strtotime($bulan)))
+                        ->whereYear('created_at', '=', date('Y', strtotime($bulan)));
                 } elseif ($filterWaktu == 'tahunan' && $tahun) {
-                    $query->whereYear('tglcek', '=', $tahun);
+                    $query->whereYear('created_at', '=', $tahun);
                 } elseif ($filterWaktu == 'custom' && $tanggalAwal && $tanggalAkhir) {
-                    $query->whereBetween('tglcek', [$tanggalAwal, $tanggalAkhir]);
+                    $query->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
                 }
             }
         });
@@ -209,6 +200,65 @@ class LaporanController extends Controller
 
         // Mengirim data ke tampilan
         return view('admin.laporan.laporanformulir', compact('formulirs', 'dataFormulir', 'formulirId', 'filterWaktu', 'bulan', 'tahun', 'tanggalAwal', 'tanggalAkhir'));
+    }
+
+    public function laporanformulirpdf(Request $request)
+    {
+        // Mengambil semua formulir
+        $formulirs = Formulir::all();
+        $formulirId = $request->input('formulir_id', null);
+        $filterWaktu = $request->input('filter_waktu', null);
+        $bulan = $request->input('bulan', null);
+        $tahun = $request->input('tahun', null);
+        $tanggalAwal = $request->input('tanggal_awal', null);
+        $tanggalAkhir = $request->input('tanggal_akhir', null);
+
+        // Mengatur query awal
+        $query = Formulir::query();
+
+        // Menambahkan kondisi jika formulir dipilih
+        if ($formulirId) {
+            $query->where('id', $formulirId);
+        }
+
+        // Menambahkan filter waktu
+        $query->whereHas('isiForms.kelengkapan', function ($query) use ($filterWaktu, $bulan, $tahun, $tanggalAwal, $tanggalAkhir) {
+            if ($filterWaktu) {
+                if ($filterWaktu == 'bulanan' && $bulan) {
+                    $query->whereMonth('created_at', '=', date('m', strtotime($bulan)))
+                        ->whereYear('created_at', '=', date('Y', strtotime($bulan)));
+                } elseif ($filterWaktu == 'tahunan' && $tahun) {
+                    $query->whereYear('created_at', '=', $tahun);
+                } elseif ($filterWaktu == 'custom' && $tanggalAwal && $tanggalAkhir) {
+                    $query->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
+                }
+            }
+        });
+
+        // Mengambil formulir dengan relasi isiForms dan menghitung kelengkapan
+        $formulirs = $query->with(['isiForms' => function ($query) {
+            $query->withCount(['kelengkapan as jumlah_lengkap' => function ($query) {
+                $query->where('kuantitatif', true);
+            }]);
+            $query->withCount('kelengkapan');
+        }])->get();
+
+        // Memetakan data formulir untuk tampilan
+        $dataFormulir = $formulirs->map(function ($formulir) {
+            return [
+                'nama_formulir' => $formulir->nama_formulir,
+                'isi_formulir' => $formulir->isiForms->map(function ($isiForm) {
+                    $persentaseLengkap = $isiForm->kelengkapan_count > 0 ? round(($isiForm->jumlah_lengkap / $isiForm->kelengkapan_count) * 100, 2) : 0;
+                    return [
+                        'isi' => $isiForm->isi,
+                        'persentase_lengkap' => $persentaseLengkap
+                    ];
+                })
+            ];
+        });
+
+        // Mengirim data ke tampilan
+        return view('admin.laporan.laporanformulir_pdf', compact('dataFormulir'));
     }
 
     public function laporankualitatif(Request $request)
@@ -325,23 +375,23 @@ class LaporanController extends Controller
         $dataPersentaseKualitatif = array_fill(0, 7, 0);
         $tanggalMulai = Carbon::now()->subDays(6); // Mulai dari 7 hari yang lalu
         if ($tanggalAwal != null || $tanggalAkhir != null) {
-            $kelengkapan = Kelengkapan::whereBetween('tglcek', [$tanggalAwal, $tanggalAkhir])->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::whereBetween('created_at', [$tanggalAwal, $tanggalAkhir])->get(); // Mengambil data kelengkapan dari 7 hari terakhir
             $ketepatan = Ketepatan::whereBetween('created_at', [$tanggalAwal, $tanggalAkhir])->get();
         } elseif ($bulan != null) {
-            $kelengkapan = Kelengkapan::whereMonth('tglcek', '=', $bulan)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::whereMonth('created_at', '=', $bulan)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
             $ketepatan = Ketepatan::whereMonth('created_at', '=', $bulan)->get();
         } elseif ($tahun != null) {
-            $kelengkapan = Kelengkapan::whereYear('tglcek', '=', $tahun)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::whereYear('created_at', '=', $tahun)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
             $ketepatan = Ketepatan::whereYear('created_at', '=', $tahun)->get();
         } elseif ($filterWaktu != null) {
-            $kelengkapan = Kelengkapan::whereDate('tglcek', '=', $filterWaktu)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::whereDate('created_at', '=', $filterWaktu)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
             $ketepatan = Ketepatan::whereDate('created_at', '=', $filterWaktu)->get();
         } else {
             $ketepatan = Ketepatan::where('created_at', '>=', $tanggalMulai)->get();
-            $kelengkapan = Kelengkapan::where('tglcek', '>=', $tanggalMulai)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::where('created_at', '>=', $tanggalMulai)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         }
 
-        // Mengubah format x-axis menjadi tanggal dari tglcek
+        // Mengubah format x-axis menjadi tanggal dari created_at
         $xAxis = [];
         if ($tanggalAwal != null || $tanggalAkhir != null) {
             $tanggalMulaiRequest = Carbon::parse($tanggalAwal)->startOfDay();
@@ -357,11 +407,11 @@ class LaporanController extends Controller
 
         // Looping untuk menghitung persentase kuantitatif
         foreach ($kelengkapan as $kelengkapanItem) {
-            $tanggal = Carbon::parse($kelengkapanItem->tglcek)->format('d M Y'); // Mendapatkan tanggal
+            $tanggal = Carbon::parse($kelengkapanItem->created_at)->format('d M Y'); // Mendapatkan tanggal
             $index = array_search($tanggal, $xAxis); // Mencari index tanggal pada xAxis
 
             $kelengkapanHarian = $kelengkapan->filter(function ($item) use ($kelengkapanItem) {
-                return Carbon::parse($item->tglcek)->format('d M Y') === Carbon::parse($kelengkapanItem->tglcek)->format('d M Y');
+                return Carbon::parse($item->created_at)->format('d M Y') === Carbon::parse($kelengkapanItem->created_at)->format('d M Y');
             });
 
             // Hitung jumlah kelengkapan harian dan jumlah kelengkapan kuantitatif
@@ -406,16 +456,16 @@ class LaporanController extends Controller
         $array = [];
         $tanggalMulai = Carbon::now()->subDays(6);
         if ($tanggalAwal != null || $tanggalAkhir != null) {
-            $kelengkapan = Kelengkapan::with('analisis')->whereBetween('tglcek', [$tanggalAwal, $tanggalAkhir])->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir])->get(); // Mengambil data kelengkapan dari 7 hari terakhir
 
         } elseif ($bulan != null) {
-            $kelengkapan = Kelengkapan::with('analisis')->whereMonth('tglcek', '=', $bulan)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->whereMonth('created_at', '=', $bulan)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } elseif ($tahun != null) {
-            $kelengkapan = Kelengkapan::with('analisis')->whereYear('tglcek', '=', $tahun)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->whereYear('created_at', '=', $tahun)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } elseif ($filterWaktu != null) {
-            $kelengkapan = Kelengkapan::with('analisis')->whereDate('tglcek', '=', $filterWaktu)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->whereDate('created_at', '=', $filterWaktu)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } else {
-            $kelengkapan = Kelengkapan::with('analisis')->where('tglcek', '>=', $tanggalMulai)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->where('created_at', '>=', $tanggalMulai)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         }
         foreach ($dokter as $key => $value) {
             $array[] = $value->nama_dokter;
@@ -432,7 +482,7 @@ class LaporanController extends Controller
             foreach ($kelengkapanDokter as $kelengkapanItem) {
 
                 $kelengkapanHarian = $kelengkapanDokter->filter(function ($item) use ($kelengkapanItem) {
-                    return Carbon::parse($item->tglcek)->format('d M Y') === Carbon::parse($kelengkapanItem->tglcek)->format('d M Y');
+                    return Carbon::parse($item->created_at)->format('d M Y') === Carbon::parse($kelengkapanItem->created_at)->format('d M Y');
                 });
 
                 $jumlahKelengkapanHarian = $kelengkapanHarian->count();
@@ -458,16 +508,16 @@ class LaporanController extends Controller
 
         $tanggalMulai = Carbon::now()->subDays(6);
         if ($tanggalAwal != null || $tanggalAkhir != null) {
-            $kelengkapan = Kelengkapan::with('analisis')->whereBetween('tglcek', [$tanggalAwal, $tanggalAkhir])->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir])->get(); // Mengambil data kelengkapan dari 7 hari terakhir
 
         } elseif ($bulan != null) {
-            $kelengkapan = Kelengkapan::with('analisis')->whereMonth('tglcek', '=', $bulan)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->whereMonth('created_at', '=', $bulan)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } elseif ($tahun != null) {
-            $kelengkapan = Kelengkapan::with('analisis')->whereYear('tglcek', '=', $tahun)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->whereYear('created_at', '=', $tahun)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } elseif ($filterWaktu != null) {
-            $kelengkapan = Kelengkapan::with('analisis')->whereDate('tglcek', '=', $filterWaktu)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->whereDate('created_at', '=', $filterWaktu)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } else {
-            $kelengkapan = Kelengkapan::with('analisis')->where('tglcek', '>=', $tanggalMulai)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis')->where('created_at', '>=', $tanggalMulai)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         }
         $ruangan = User::whereHas('roles', function ($query) {
             $query->where('name', 'ruangan');
@@ -486,7 +536,7 @@ class LaporanController extends Controller
             foreach ($kelengkapanRuangan as $kelengkapanItem) {
 
                 $kelengkapanHarian = $kelengkapanRuangan->filter(function ($item) use ($kelengkapanItem) {
-                    return Carbon::parse($item->tglcek)->format('d M Y') === Carbon::parse($kelengkapanItem->tglcek)->format('d M Y');
+                    return Carbon::parse($item->created_at)->format('d M Y') === Carbon::parse($kelengkapanItem->created_at)->format('d M Y');
                 });
 
                 $jumlahKelengkapanHarian = $kelengkapanHarian->count();
@@ -510,16 +560,16 @@ class LaporanController extends Controller
 
         $tanggalMulai = Carbon::now()->subDays(6);
         if ($tanggalAwal != null || $tanggalAkhir != null) {
-            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->whereBetween('tglcek', [$tanggalAwal, $tanggalAkhir])->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir])->get(); // Mengambil data kelengkapan dari 7 hari terakhir
 
         } elseif ($bulan != null) {
-            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->whereMonth('tglcek', '=', $bulan)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->whereMonth('created_at', '=', $bulan)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } elseif ($tahun != null) {
-            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->whereYear('tglcek', '=', $tahun)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->whereYear('created_at', '=', $tahun)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } elseif ($filterWaktu != null) {
-            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->whereDate('tglcek', '=', $filterWaktu)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->whereDate('created_at', '=', $filterWaktu)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         } else {
-            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->where('tglcek', '>=', $tanggalMulai)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
+            $kelengkapan = Kelengkapan::with('analisis', 'formulir')->where('created_at', '>=', $tanggalMulai)->get(); // Mengambil data kelengkapan dari 7 hari terakhir
         }
         $formulir = Formulir::get();
         foreach ($formulir as $key => $value) {
@@ -535,7 +585,7 @@ class LaporanController extends Controller
             foreach ($kelengkapanFormulir as $kelengkapanItem) {
 
                 $kelengkapanHarian = $kelengkapanFormulir->filter(function ($item) use ($kelengkapanItem) {
-                    return Carbon::parse($item->tglcek)->format('d M Y') === Carbon::parse($kelengkapanItem->tglcek)->format('d M Y');
+                    return Carbon::parse($item->created_at)->format('d M Y') === Carbon::parse($kelengkapanItem->created_at)->format('d M Y');
                 });
 
                 $jumlahKelengkapanHarian = $kelengkapanHarian->count();

@@ -60,12 +60,12 @@
                                             </select>
                                         </div>
                                         <div class="col-sm-3">
-                                            <button type="submit" class="btn btn-primary">Tampilkan Laporan</button>
+                                            <button type="submit" class="btn btn-primary">Filter</button>
                                         </div>
                                     </div>
                                 </form>
                                 <div class="text-left mb-3">
-                                    <a href="{{ route('admin.laporanpdf', Request::getQueryString()) }}" class="btn btn-youtube mr-1" target="_blank">
+                                    <a href="{{ route('admin.laporanformulirpdf', Request::getQueryString()) }}" class="btn btn-youtube mr-1" onclick="window.open(this.href, '_blank'); return false;">
                                         PDF <i class="fas fa-file-pdf"></i>
                                     </a>
                                     <a href="{{ route('admin.laporanexcel', Request::getQueryString()) }}" class="btn btn-success">
@@ -96,9 +96,13 @@
         </div>
         @if (isset($dataFormulir))
         <div class="row">
+            @foreach ($dataFormulir as $formulir)
             <div class="col-md-12 grid-margin stretch-card">
-                <!-- Card for Table -->
+                <!-- Card for Each Form -->
                 <div class="card">
+                    <div class="card-header">
+                        <h5>{{ $formulir['nama_formulir'] }}</h5>
+                    </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
@@ -106,27 +110,27 @@
                                     <table class="table display expandable-table">
                                         <thead>
                                             <tr>
-                                                <th>Nama Formulir</th>
-                                                <th>Detail Isi Formulir</th>
-                                                <th>Persentase Lengkap</th>
+                                                <th>Isi Formulir</th>
+                                                <th>Persentase</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($dataFormulir as $formulir)
+                                            @foreach ($formulir['isi_formulir'] as $isi)
                                             <tr>
-                                                <td>{{ $formulir['nama_formulir'] }}</td>
-                                                <td>
-                                                    <div class="text-left">
-                                                        <ul class="list-group">
-                                                            @foreach ($formulir['isi_formulir'] as $isi)
-                                                            <li class="list-group-item">{{ $isi['isi'] }} - {{ $isi['persentase_lengkap'] }}%</li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                                <td>{{ number_format($formulir['isi_formulir']->avg('persentase_lengkap'), 2) }}%</td>
+                                                <td>{{ $isi['isi'] }}</td>
+                                                <td>{{ $isi['persentase_lengkap'] }}%</td>
                                             </tr>
                                             @endforeach
+                                            @if (empty($formulir['isi_formulir']))
+                                            <tr>
+                                                <td colspan="2">Tidak ada data yang tersedia</td>
+                                            </tr>
+                                            @else
+                                            <tr>
+                                                <td><strong>Total Data:</strong> {{ count($formulir['isi_formulir']) }}</td>
+                                                <td><strong>Rata-rata Persentase:</strong> {{ number_format(collect($formulir['isi_formulir'])->avg('persentase_lengkap'), 2) }}%</td>
+                                            </tr>
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>
@@ -135,6 +139,7 @@
                     </div>
                 </div>
             </div>
+            @endforeach
         </div>
         @endif
     </div>

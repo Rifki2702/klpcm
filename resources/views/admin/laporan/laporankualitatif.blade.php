@@ -46,10 +46,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
-                                        <div class="col-sm-3">
-                                            <button type="submit" class="btn btn-primary">Tampilkan Laporan</button>
-                                        </div>
+                                    <div class="mb-4 text-right">
+                                        <button class="btn btn-primary">Filter</button>
                                     </div>
                                 </form>
                                 <div class="text-left mb-3">

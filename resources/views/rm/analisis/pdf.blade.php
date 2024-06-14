@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLPCM</title>
+    <title>Laporan Item Tidak Lengkap</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,82 +16,66 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
         }
 
-        h3 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .card {
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            margin-bottom: 10px;
-            padding: 10px;
-            position: relative;
-        }
-
-        .card-header {
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .card-body {
-            font-size: 12px;
-            text-align: center;
-        }
-
-        .row {
+        .header {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            margin-bottom: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            margin-top: 40px;
         }
 
-        .col-sm-3 {
-            flex: 0 0 22%;
-            max-width: 22%;
-            margin-bottom: 10px;
+        .header img {
+            width: 70px;
+            margin-right: 20px;
         }
 
-        .col-sm-6 {
-            flex: 0 0 48%;
-            max-width: 48%;
-            margin-bottom: 10px;
+        .header div {
+            text-align: center;
+            flex: 1;
         }
 
-        .col-sm-8 {
-            flex: 0 0 66%;
-            max-width: 66%;
-            margin-bottom: 10px;
+        .header div h2 {
+            margin: 0;
         }
 
-        .col-sm-12 {
-            flex: 0 0 100%;
-            max-width: 100%;
-            margin-bottom: 10px;
+        .header div p {
+            margin: 5px 0;
         }
 
-        .text-right {
-            text-align: right;
+        .info {
+            margin-bottom: 20px;
         }
 
-        /* Kop Surat */
+        .info p {
+            margin: 5px 0;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .incomplete-items {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         .rangkasurat {
             width: 100%;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
-            box-sizing: border-box;
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+            /* Add margin-bottom to create space */
         }
 
         table {
-            border-bottom: 5px solid #000;
             width: 100%;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
         }
 
         td {
@@ -108,24 +92,32 @@
             margin: 5px 0;
         }
 
-        hr {
-            border: 1px solid #ccc;
-            margin: 20px 0;
+        .card {
+            display: inline-block;
+            width: 22%;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin: 10px;
+            vertical-align: top;
         }
 
-        .date-top-right {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 12px;
-            margin-top: 5px;
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 10px;
+            font-weight: bold;
         }
 
-        .text-left {
-            text-align: left;
+        .card-body {
+            padding: 10px;
         }
 
-        button {
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .buttons button {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -133,96 +125,94 @@
             color: white;
             font-size: 14px;
             cursor: pointer;
-            margin-top: 20px;
+            margin: 0 10px;
         }
 
-        button:hover {
+        .buttons button:hover {
             background-color: #0056b3;
         }
 
         @media print {
-            button {
+            .buttons {
                 display: none;
+            }
+
+            .header {
+                page-break-before: always;
+                position: fixed;
+                top: 0;
+                width: 100%;
+            }
+
+            body {
+                margin-top: 150px;
+                /* Adjust this value to ensure the content doesn't overlap the header */
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="rangkasurat">
-        <table>
-            <tr>
-                <td><img src="{{ asset('foto/logo.png') }}" width="70px"></td>
-                <td class="tengah">
-                    <h2>RUMAH SAKIT CITRA HUSADA JEMBER</h2>
-                    <b>Jl. Teratai No.22, Gebang Timur, Gebang, Kec. Patrang,</b>
-                    <b>Kabupaten Jember, Jawa Timur 68117</b>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="main-panel">
-        <div class="content-wrapper">
-            <div class="row">
-                <div class="col-sm-8">
-                    <div class="card">
-                        <div class="date-top-right">
-                            <p>Tanggal Berkas: {{ date('d/m/Y') }}</p>
-                        </div>
-                        <div class="card-body">
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-sm-12 text-left">
-                                        <p><strong>No RM:</strong> {{ $analisis->pasien->rm }}</p>
-                                        <p><strong>Nama:</strong> {{ $analisis->pasien->name }}</p>
-                                        <p><strong>Ruangan:</strong> {{ $analisis->user->name }}</p>
-                                        <p><strong>Dokter:</strong>
-                                            @if($analisis->dokter)
-                                            {{ $analisis->dokter->nama_dokter }}
-                                            @else
-                                            Tidak ada dokter yang ditugaskan
-                                            @endif
-                                        </p>
-                                        <p><strong>Kuantitatif:</strong> {{ number_format($persentaseKuantitatif, 2) }}%</p>
-                                        <p><strong>Kualitatif:</strong> {{ number_format($persentaseKualitatif, 2) }}%</p>
-                                    </div>
-                                </div>
-                                <hr>
-                                <h3>Item Tidak Lengkap</h3>
-
-                                @php
-                                $formulirIds = [];
-                                if ($analisis->kelengkapans) {
-                                $formulirIds = $analisis->kelengkapans->where('kuantitatif', 0)->pluck('formulir_id')->unique();
-                                }
-                                @endphp
-                                <div class="row justify-content-center">
-                                    @foreach ($formulirIds as $index => $formulirId)
-                                    <div class="col-sm-3">
-                                        <div class="card border">
-                                            <div class="card-header">
-                                                <h5><strong>{{ $analisis->kelengkapans->where('formulir_id', $formulirId)->first()->formulir->nama_formulir }}</strong></h5>
-                                            </div>
-                                            <div class="card-body">
-                                                @foreach ($analisis->kelengkapans->where('formulir_id', $formulirId) as $kelengkapan)
-                                                <p>{{ $kelengkapan->isiForm->isi }}</p>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @if (($index + 1) % 4 == 0 && $index + 1 != count($formulirIds))
-                                </div>
-                                <div class="row justify-content-center">
-                                    @endif
-                                    @endforeach
-                                </div>
-                                <button onclick="window.print()">Print</button>
-                            </div>
-                        </div>
-                    </div>
+    <table class="rangkasurat">
+        <tr>
+            <td>
+                <img src="{{ asset('foto/logo.png') }}" width="70px">
+            </td>
+            <td class="tengah">
+                <h2>RUMAH SAKIT CITRA HUSADA JEMBER</h2>
+                <b>Jl. Teratai No.22, Gebang Timur, Gebang, Kec. Patrang,</b>
+                <b>Kabupaten Jember, Jawa Timur 68117</b>
+            </td>
+        </tr>
+    </table>
+    <div class="container">
+        <div class="header">
+            <p>Tanggal Berkas: 13/06/2024</p>
+        </div>
+        <div class="info">
+            <p><strong>No RM:</strong> 827656</p>
+            <p><strong>Nama:</strong> Rifki Fadilah</p>
+            <p><strong>Ruangan:</strong> Anturium</p>
+            <p><strong>Dokter:</strong> dr. Fadil</p>
+            <p><strong>Kuantitatif:</strong> 84.62%</p>
+            <p><strong>Kualitatif:</strong> 85.71%</p>
+        </div>
+        <div class="title">
+            <h3>Item Tidak Lengkap</h3>
+        </div>
+        <div class="incomplete-items">
+            <div class="card">
+                <div class="card-header">Resume Pasien Pulang</div>
+                <div class="card-body">
+                    <p>Tanggal Keluar</p>
+                    <p>Riwayat Alergi</p>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-header">CPPT</div>
+                <div class="card-body">
+                    <p>Nama</p>
+                    <p>Ruang/Kelas</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Ringkasan Masuk dan Keluar</div>
+                <div class="card-body">
+                    <p>Tgl Lahir</p>
+                    <p>Alamat</p>
+                    <p>Gol Darah</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Informed Consent</div>
+                <div class="card-body">
+                    <p>Nama</p>
+                </div>
+            </div>
+        </div>
+        <div class="buttons">
+            <button onclick="window.history.back()">Kembali</button>
+            <button onclick="window.print()">Cetak</button>
         </div>
     </div>
 </body>

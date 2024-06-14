@@ -83,6 +83,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::get('/laporan/pdf', [LaporanController::class, 'downloadPDF'])->name('laporanpdf');
     Route::get('/laporan/excel', [LaporanController::class, 'downloadExcel'])->name('laporanexcel');
     Route::get('/getchart', [LaporanController::class, 'getchart'])->name('getchart');
+    Route::get('/laporanformulirpdf', [LaporanController::class, 'laporanformulirpdf'])->name('laporanformulirpdf');
 });
 // NOTIFICATION READ
 Route::get('/notification', [NotificationController::class, 'markRead'])->name('notifications.markAsRead');

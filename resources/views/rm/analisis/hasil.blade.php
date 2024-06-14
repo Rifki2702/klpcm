@@ -3,7 +3,7 @@
 @section('content')
 <div class="main-panel">
     <div class="content-wrapper">
-        <div class="row"> <!-- Tambahkan class justify-content-center -->
+        <div class="row justify-content-center"> <!-- Tambahkan class justify-content-center -->
             <div class="col-md-12 grid-margin stretch-card"> <!-- Ubah ukuran kolom menjadi col-md-8 -->
                 <div class="card">
                     <div class="card-body">
@@ -20,14 +20,8 @@
                                             <p><strong>No RM:</strong> {{ $analisis->pasien->rm }}</p>
                                             <p><strong>Nama:</strong> {{ $analisis->pasien->name }}</p>
                                             <p><strong>Ruangan:</strong> {{ $analisis->user->name }}</p>
-                                            <p><strong>Dokter:</strong>
-                                                @if($analisis->dokter)
-                                                {{ $analisis->dokter->nama_dokter }}
-                                                @else
-                                                Tidak ada dokter yang ditugaskan
-                                                @endif
-                                            </p>
-                                            <p><strong>Kuantitatif:</strong> {{ number_format($persentaseKuantitatif, 2) }}%</p>
+                                            <p><strong>Dokter:</strong> {{ $analisis->dokter->nama_dokter }}</p>
+                                            <p><strong>Kuantitatif:</strong> {{ number_format($persentaseKuantitatif1, 2) }}%</p>
                                             <p><strong>Kualitatif:</strong> {{ number_format($persentaseKualitatif, 2) }}%</p>
                                         </div>
                                     </div>
@@ -46,10 +40,10 @@
                                         <div class="col-md-3 mb-4">
                                             <div class="card border">
                                                 <div class="card-header text-center">
-                                                    <h5><strong>{{ $analisis->kelengkapans->where('formulir_id', $formulirId)->first()->formulir->nama_formulir }}</strong></h5>
+                                                    <h5><strong>{{ $analisis->kelengkapans->where('formulir_id', $formulirId)->where('kuantitatif', 0)->first()->formulir->nama_formulir }}</strong></h5>
                                                 </div>
                                                 <div class="card-body text-center">
-                                                    @foreach ($analisis->kelengkapans->where('formulir_id', $formulirId) as $kelengkapan)
+                                                    @foreach ($analisis->kelengkapans->where('formulir_id', $formulirId)->where('kuantitatif', 0) as $kelengkapan)
                                                     <p>{{ $kelengkapan->isiForm->isi }}</p>
                                                     @endforeach
                                                 </div>

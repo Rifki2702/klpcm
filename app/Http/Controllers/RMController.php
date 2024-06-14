@@ -244,9 +244,11 @@ class RMController extends Controller
             'kuantitatif' => 'required|array',
             'kuantitatif.*' => 'boolean',
         ]);
+
         try {
             $dataKelengkapans = [];
             $containsFalse = false; // Flag untuk menandakan apakah terdapat nilai boolean false
+            $currentTimestamp = now();
 
             // Iterasi semua inputan kuantitatif
             foreach ($request->kuantitatif as $isiFormId => $statusKuantitatif) {
@@ -262,6 +264,8 @@ class RMController extends Controller
                     'formulir_id' => $isiForm->formulir_id,
                     'isi_form_id' => $isiFormId,
                     'kuantitatif' => $statusKuantitatif,
+                    'created_at' => $currentTimestamp,
+                    'updated_at' => $currentTimestamp,
                 ];
 
                 // Periksa jika terdapat nilai boolean false
@@ -271,7 +275,6 @@ class RMController extends Controller
             }
 
             // Simpan semua data kuantitatif sekaligus ke dalam tabel Kelengkapan
-            // $id = DB::table('kelengkapan')->insertGetId([$dataKelengkapans]);
             Kelengkapan::insert($dataKelengkapans);
 
             // Kirim notifikasi
@@ -457,53 +460,99 @@ class RMController extends Controller
 
     public function hasil($analisisId)
     {
-        // Ambil data analisis dari database termasuk data dokter, pasien, dan semua kelengkapan
-        $analisis = Analisis::with(['user', 'pasien', 'kelengkapans', 'ketepatans', 'dokter'])->find($analisisId);
+        $analisis = Analisis::with([
+            'user',
+            'pasien',
+            'dokter', // Pastikan Anda memuat relasi 'dokter' jika ingin mengaksesnya
+            'kelengkapans' => function ($query) {
+                $query->with('formulir', 'isiForm');
+            },
+            'ketepatans'
+        ])->find($analisisId);
 
-        // Pastikan data analisis ditemukan
         if (!$analisis) {
-            abort(404, 'Analisis tidak ditemukan.');
+            // Jika tidak ditemukan, mungkin Anda ingin mengarahkan kembali atau memberikan pesan kesalahan
+            return redirect()->back()->with('error', 'Analisis tidak ditemukan');
         }
 
-        // Hitung jumlah kuantitatif yang memiliki nilai boolean 1
-        $jumlahKuantitatif = $analisis->kelengkapans->where('kuantitatif', true)->count();
+        // Hitung jumlah kelengkapans yang memiliki nilai kuantitatif 0
+        $jumlahKuantitatif0 = $analisis->kelengkapans->where('kuantitatif', 0)->count();
 
-        // Hitung persentase kelengkapan kuantitatif
-        $persentaseKuantitatif = count($analisis->kelengkapans) > 0 ? round(($jumlahKuantitatif / count($analisis->kelengkapans)) * 100, 2) : 0;
+        // Hitung jumlah kelengkapans yang memiliki nilai kuantitatif 1
+        $jumlahKuantitatif1 = $analisis->kelengkapans->where('kuantitatif', 1)->count();
 
-        // Hitung jumlah kualitatif yang memiliki nilai boolean 1
+        // Hitung persentase kelengkapan kuantitatif 0
+        $totalKelengkapans = $analisis->kelengkapans->count();
+        $persentaseKuantitatif0 = $totalKelengkapans > 0 ? round(($jumlahKuantitatif0 / $totalKelengkapans) * 100, 2) : 0;
+
+        // Hitung persentase kelengkapan kuantitatif 1
+        $persentaseKuantitatif1 = $totalKelengkapans > 0 ? round(($jumlahKuantitatif1 / $totalKelengkapans) * 100, 2) : 0;
+
+        // Hitung jumlah ketepatans yang memiliki nilai ketepatan true
         $jumlahKualitatif = $analisis->ketepatans->where('ketepatan', true)->count();
 
         // Hitung persentase ketepatan kualitatif
-        $persentaseKualitatif = count($analisis->ketepatans) > 0 ? round(($jumlahKualitatif / count($analisis->ketepatans)) * 100, 2) : 0;
+        $totalKetepatans = $analisis->ketepatans->count();
+        $persentaseKualitatif = $totalKetepatans > 0 ? round(($jumlahKualitatif / $totalKetepatans) * 100, 2) : 0;
 
         // Kirim data ke view
-        return view('rm.analisis.hasil', compact('analisis', 'persentaseKuantitatif', 'persentaseKualitatif'));
+        return view('rm.analisis.hasil', compact(
+            'analisis',
+            'persentaseKuantitatif0',
+            'persentaseKuantitatif1',
+            'persentaseKualitatif',
+            'jumlahKuantitatif0',
+            'jumlahKuantitatif1',
+            'jumlahKualitatif'
+        ));
     }
 
     public function pdf($analisisId)
     {
-        // Ambil data analisis dari database termasuk data dokter, pasien, dan semua kelengkapan
-        $analisis = Analisis::with(['user', 'pasien', 'kelengkapans', 'ketepatans', 'dokter'])->find($analisisId);
+        $analisis = Analisis::with([
+            'user',
+            'pasien',
+            'dokter', // Pastikan Anda memuat relasi 'dokter' jika ingin mengaksesnya
+            'kelengkapans' => function ($query) {
+                $query->with('formulir', 'isiForm');
+            },
+            'ketepatans'
+        ])->find($analisisId);
 
-        // Pastikan data analisis ditemukan
         if (!$analisis) {
-            abort(404, 'Analisis tidak ditemukan.');
+            // Jika tidak ditemukan, mungkin Anda ingin mengarahkan kembali atau memberikan pesan kesalahan
+            return redirect()->back()->with('error', 'Analisis tidak ditemukan');
         }
 
-        // Hitung jumlah kuantitatif yang memiliki nilai boolean 1
-        $jumlahKuantitatif = $analisis->kelengkapans->where('kuantitatif', true)->count();
+        // Hitung jumlah kelengkapans yang memiliki nilai kuantitatif 0
+        $jumlahKuantitatif0 = $analisis->kelengkapans->where('kuantitatif', 0)->count();
 
-        // Hitung persentase kelengkapan kuantitatif
-        $persentaseKuantitatif = count($analisis->kelengkapans) > 0 ? round(($jumlahKuantitatif / count($analisis->kelengkapans)) * 100, 2) : 0;
+        // Hitung jumlah kelengkapans yang memiliki nilai kuantitatif 1
+        $jumlahKuantitatif1 = $analisis->kelengkapans->where('kuantitatif', 1)->count();
 
-        // Hitung jumlah kualitatif yang memiliki nilai boolean 1
+        // Hitung persentase kelengkapan kuantitatif 0
+        $totalKelengkapans = $analisis->kelengkapans->count();
+        $persentaseKuantitatif0 = $totalKelengkapans > 0 ? round(($jumlahKuantitatif0 / $totalKelengkapans) * 100, 2) : 0;
+
+        // Hitung persentase kelengkapan kuantitatif 1
+        $persentaseKuantitatif1 = $totalKelengkapans > 0 ? round(($jumlahKuantitatif1 / $totalKelengkapans) * 100, 2) : 0;
+
+        // Hitung jumlah ketepatans yang memiliki nilai ketepatan true
         $jumlahKualitatif = $analisis->ketepatans->where('ketepatan', true)->count();
 
         // Hitung persentase ketepatan kualitatif
-        $persentaseKualitatif = count($analisis->ketepatans) > 0 ? round(($jumlahKualitatif / count($analisis->ketepatans)) * 100, 2) : 0;
+        $totalKetepatans = $analisis->ketepatans->count();
+        $persentaseKualitatif = $totalKetepatans > 0 ? round(($jumlahKualitatif / $totalKetepatans) * 100, 2) : 0;
 
         // Kirim data ke view
-        return view('rm.analisis.pdf', compact('analisis', 'persentaseKuantitatif', 'persentaseKualitatif'));
+        return view('rm.analisis.pdf', compact(
+            'analisis',
+            'persentaseKuantitatif0',
+            'persentaseKuantitatif1',
+            'persentaseKualitatif',
+            'jumlahKuantitatif0',
+            'jumlahKuantitatif1',
+            'jumlahKualitatif'
+        ));
     }
 }

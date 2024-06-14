@@ -47,6 +47,6 @@ class Analisis extends Model
     }
     public function dokter()
     {
-        return $this->belongsTo(Analisis::class);
+        return $this->belongsTo(Dokter::class, 'dokter_id');
     }
 }

@@ -18,6 +18,17 @@
             {{ session('warning') }}
         </div>
         @endif
+
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <div class="d-flex justify-content mb-3">
             <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#modalTambahUser"><i class="fas fa-user-plus"></i> Tambah User</a>
         </div>
@@ -31,9 +42,8 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama</th>
-                                        <th>Jabatan</th>
+                                        <th>Role Akses</th>
                                         <th>Email</th>
-                                        <th>Foto</th>
                                         <th>Opsi</th>
                                     </tr>
                                 </thead>
@@ -48,7 +58,6 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $d->email }}</td>
-                                        <td><img src="{{ asset('storage/foto-user/'.$d->image) }}" alt="" width="100"></td>
                                         <td>
                                             <div class="btn-group" role="group" aria-label="First group">
                                                 <button type="button" class="btn btn-warning btn-icon-text" data-toggle="modal" data-target="#modalEditUser{{ $d->id }}">
@@ -62,103 +71,6 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <!-- Modal Tambah User -->
-                                    <div class="modal fade" id="modalTambahUser" tabindex="-1" role="dialog" aria-labelledby="modalTambahUserLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="modalTambahUserLabel">Tambah User</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form method="POST" action="{{ route('admin.insertuser') }}" enctype="multipart/form-data">
-                                                        @csrf
-
-                                                        <div class="form-group row">
-                                                            <label for="name" class="col-sm-2 col-form-label text-left">Nama Petugas</label>
-                                                            <label class="col-sm-1 col-form-label">:</label>
-                                                            <div class="col-sm-9">
-                                                                <input type="text" class="form-control" id="name" name="name" placeholder="Nama Petugas" required>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="form-group row">
-                                                            <label for="email" class="col-sm-2 col-form-label text-left">Email</label>
-                                                            <label class="col-sm-1 col-form-label">:</label>
-                                                            <div class="col-sm-9">
-                                                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="form-group row">
-                                                            <label for="role_id" class="col-sm-2 col-form-label text-left">Role</label>
-                                                            <label class="col-sm-1 col-form-label">:</label>
-                                                            <div class="col-sm-9">
-                                                                <select name="role_id" id="role_id" class="form-control" required>
-                                                                    @foreach($roles as $role)
-                                                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="form-group row">
-                                                            <label for="password" class="col-sm-2 col-form-label text-left">Password</label>
-                                                            <label class="col-sm-1 col-form-label">:</label>
-                                                            <div class="col-sm-9">
-                                                                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="form-group row">
-                                                            <label for="password_confirmation" class="col-sm-2 col-form-label text-left">Konfirmasi Password</label>
-                                                            <label class="col-sm-1 col-form-label">:</label>
-                                                            <div class="col-sm-9">
-                                                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi Password" required>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="form-group row">
-                                                            <label for="gender" class="col-sm-2 col-form-label text-left">Jenis Kelamin</label>
-                                                            <label class="col-sm-1 col-form-label">:</label>
-                                                            <div class="col-sm-9">
-                                                                <select name="gender" id="gender" class="form-control" required>
-                                                                    <option value="Laki-Laki">Laki-Laki</option>
-                                                                    <option value="Perempuan">Perempuan</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="form-group row">
-                                                            <label for="foto" class="col-sm-2 col-form-label text-left">Foto</label>
-                                                            <label class="col-sm-1 col-form-label text-left">:</label>
-                                                            <div class="col-sm-9 text-left">
-                                                                <input type="file" name="foto" class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp" style="display: none;" onchange="displaySelectedPhoto(this)">
-                                                                <button type="button" class="file-upload-browse btn btn-outline-secondary btn-icon-text" onclick="document.getElementById('exampleInputFile').click();">
-                                                                    <i class="ti-image btn-icon-prepend"></i>
-                                                                    Upload
-                                                                </button>
-                                                                <div class="mt-2">
-                                                                    <img id="selectedPhoto" src="#" alt="Selected Photo" style="max-width: 100%; max-height: 200px; display: none;">
-                                                                    <button type="button" class="btn btn-danger btn-sm mt-2" id="deleteButton" onclick="resetSelectedPhoto()" style="display: none;">Hapus</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-success btn-icon-text">
-                                                                <i class="ti-save btn-icon-prepend"></i>
-                                                                Simpan
-                                                            </button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End Modal Tambah User -->
 
                                     <!-- Modal Edit User -->
                                     <div class="modal fade" id="modalEditUser{{ $d->id }}" tabindex="-1" role="dialog" aria-labelledby="modalEditUserLabel{{ $d->id }}" aria-hidden="true">
@@ -171,14 +83,18 @@
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form method="POST" action="{{ route('admin.edituser',['id' => $d->id]) }}" enctype="multipart/form-data">
+                                                    <form method="POST" action="{{ route('admin.edituser', ['id' => $d->id]) }}" enctype="multipart/form-data">
                                                         @csrf
                                                         @method('PUT')
+
                                                         <div class="form-group row">
                                                             <label for="name" class="col-sm-2 col-form-label text-left">Nama Petugas</label>
                                                             <label class="col-sm-1 col-form-label text-left">:</label>
                                                             <div class="col-sm-9">
                                                                 <input type="text" class="form-control" id="name" name="name" value="{{ $d->name }}" placeholder="Nama Petugas">
+                                                                @error('name')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                                @enderror
                                                             </div>
                                                         </div>
 
@@ -187,6 +103,9 @@
                                                             <label class="col-sm-1 col-form-label text-left">:</label>
                                                             <div class="col-sm-9">
                                                                 <input type="email" class="form-control" id="email" name="email" value="{{ $d->email }}" placeholder="Email">
+                                                                @error('email')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                                @enderror
                                                             </div>
                                                         </div>
 
@@ -199,6 +118,9 @@
                                                                     <option value="{{ $role->id }}" {{ $d->roles->contains('id', $role->id) ? 'selected' : '' }}>{{ $role->name }}</option>
                                                                     @endforeach
                                                                 </select>
+                                                                @error('role_id')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                                @enderror
                                                             </div>
                                                         </div>
 
@@ -210,6 +132,31 @@
                                                                     <option value="Laki-Laki" {{ $d->gender == 'Laki-Laki' ? 'selected' : '' }}>Laki-Laki</option>
                                                                     <option value="Perempuan" {{ $d->gender == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
                                                                 </select>
+                                                                @error('gender')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                                @enderror
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group row">
+                                                            <label for="password" class="col-sm-2 col-form-label text-left">Password</label>
+                                                            <label class="col-sm-1 col-form-label text-left">:</label>
+                                                            <div class="col-sm-9">
+                                                                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                                                                @error('password')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                                @enderror
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group row">
+                                                            <label for="password_confirmation" class="col-sm-2 col-form-label text-left">Konfirmasi Password</label>
+                                                            <label class="col-sm-1 col-form-label text-left">:</label>
+                                                            <div class="col-sm-9">
+                                                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi Password">
+                                                                @error('password_confirmation')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                                @enderror
                                                             </div>
                                                         </div>
 
@@ -217,15 +164,10 @@
                                                             <label for="foto" class="col-sm-2 col-form-label text-left">Foto</label>
                                                             <label class="col-sm-1 col-form-label text-left">:</label>
                                                             <div class="col-sm-9 text-left">
-                                                                <input type="file" name="foto" class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp" style="display: none;" onchange="displaySelectedPhoto(this)">
-                                                                <button type="button" class="file-upload-browse btn btn-outline-secondary btn-icon-text" onclick="document.getElementById('exampleInputFile').click();">
-                                                                    <i class="ti-image btn-icon-prepend"></i>
-                                                                    Upload
-                                                                </button>
-                                                                <div class="mt-2">
-                                                                    <img id="selectedPhoto" src="#" alt="Selected Photo" style="max-width: 100%; max-height: 200px; display: none;">
-                                                                    <button type="button" class="btn btn-danger btn-sm mt-2" id="deleteButton" onclick="resetSelectedPhoto()" style="display: none;">Hapus</button>
-                                                                </div>
+                                                                <input type="file" name="foto" class="form-control-file" id="foto" aria-describedby="fileHelp">
+                                                                @error('foto')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                                @enderror
                                                             </div>
                                                         </div>
 
@@ -283,6 +225,122 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Tambah User -->
+<div class="modal fade" id="modalTambahUser" tabindex="-1" role="dialog" aria-labelledby="modalTambahUserLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTambahUserLabel">Tambah User Baru</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ route('admin.insertuser') }}" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-2 col-form-label text-left">Nama Petugas</label>
+                        <label class="col-sm-1 col-form-label text-left">:</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Nama Petugas" value="{{ old('name') }}">
+                            @error('name')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="email" class="col-sm-2 col-form-label text-left">Email</label>
+                        <label class="col-sm-1 col-form-label text-left">:</label>
+                        <div class="col-sm-9">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ old('email') }}">
+                            @error('email')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="role_id" class="col-sm-2 col-form-label text-left">Role</label>
+                        <label class="col-sm-1 col-form-label text-left">:</label>
+                        <div class="col-sm-9">
+                            <select name="role_id" id="role_id" class="form-control">
+                                @foreach($roles as $role)
+                                <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('role_id')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="gender" class="col-sm-2 col-form-label text-left">Jenis Kelamin</label>
+                        <label class="col-sm-1 col-form-label text-left">:</label>
+                        <div class="col-sm-9">
+                            <select name="gender" id="gender" class="form-control">
+                                <option value="Laki-Laki" {{ old('gender') == 'Laki-Laki' ? 'selected' : '' }}>Laki-Laki</option>
+                                <option value="Perempuan" {{ old('gender') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                            </select>
+                            @error('gender')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="password" class="col-sm-2 col-form-label text-left">Password</label>
+                        <label class="col-sm-1 col-form-label text-left">:</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                            @error('password')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="password_confirmation" class="col-sm-2 col-form-label text-left">Konfirmasi Password</label>
+                        <label class="col-sm-1 col-form-label text-left">:</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi Password">
+                            @error('password_confirmation')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="foto" class="col-sm-2 col-form-label text-left">Foto</label>
+                        <label class="col-sm-1 col-form-label text-left">:</label>
+                        <div class="col-sm-9 text-left">
+                            <input type="file" name="foto" class="form-control-file" id="foto" aria-describedby="fileHelp">
+                            @error('foto')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="col-sm-12 text-right">
+                            <button type="submit" class="btn btn-success btn-icon-text">
+                                <i class="ti-save btn-icon-prepend"></i>
+                                Save
+                            </button>
+                            <button type="reset" class="btn btn-danger btn-icon-text">
+                                <i class="ti-reload btn-icon-prepend"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
+
+<!-- End Modal Tambah User -->
 @endsection

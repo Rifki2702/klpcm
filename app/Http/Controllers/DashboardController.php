@@ -35,6 +35,15 @@ class DashboardController extends Controller
 
         $jumlahAnalisis = Analisis::count(); // Menambahkan jumlah analisis
 
+        // Menghitung jumlah kuantitatif yang lengkap
+        $jumlahKuantitatifLengkap = Kelengkapan::where('kuantitatif', true)->count();
+
+        // Menghitung jumlah keseluruhan kuantitatif
+        $jumlahKeseluruhanKuantitatif = Kelengkapan::count();
+
+        // Menghitung persentase kelengkapan kuantitatif
+        $persentaseKelengkapanKuantitatif = $jumlahKeseluruhanKuantitatif > 0 ? ($jumlahKuantitatifLengkap / $jumlahKeseluruhanKuantitatif) * 100 : 0;
+
         // Mengambil data untuk chart kuantitatif
         $data['KuantitatifChart'] = $KuantitatifChart->build();
         $data['KualitatifChart'] = $KualitatifChart->build();
@@ -44,9 +53,16 @@ class DashboardController extends Controller
         $data['jumlahTidakLengkap'] = $jumlahTidakLengkap;
         $data['jumlahAnalisis'] = $jumlahAnalisis; // Menyimpan jumlah analisis
 
-        $data['ketepatanAnalisis'] = DB::table('ketepatan')
+        // Menghitung persentase ketepatan analisis
+        $jumlahKetepatan = DB::table('ketepatan')
             ->where('ketepatan', true)
             ->count();
+        $persentaseKetepatan = $jumlahAnalisis > 0 ? ($jumlahKetepatan / $jumlahAnalisis) * 100 : 0;
+
+        // Menambahkan data persentase ke dalam array data
+        $data['persentaseKetepatan'] = $persentaseKetepatan;
+        $data['persentaseKelengkapanKuantitatif'] = $persentaseKelengkapanKuantitatif;
+
         $analisis = Analisis::whereHas('user.roles', function ($query) {
             $query->where('name', 'dokter');
         })->get();
@@ -102,8 +118,8 @@ class DashboardController extends Controller
 
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
-                $filename = Carbon::now()->translatedFormat('his').Str::slug($request->name).'.'.$file->extension();
-                $file->storeAs('public/user/'.$filename);
+                $filename = Carbon::now()->translatedFormat('his') . Str::slug($request->name) . '.' . $file->extension();
+                $file->storeAs('public/user/' . $filename);
                 $user->image = $filename;
                 $imagePath = $request->file('image')->store('photos', 'public');
                 $data['image'] = $imagePath;
@@ -113,7 +129,6 @@ class DashboardController extends Controller
             // $user->update($data);
 
             return redirect()->route('admin.dashboard')->with('success', 'Data berhasil diperbarui');
-
         } catch (Exception $th) {
             return $th;
         }

@@ -7,7 +7,11 @@
         <div class="row">
           <div class="col-12 col-xl-8 mb-4 mb-xl-0">
             <h3 class="font-weight-bold">Welcome {{ session('username') }}</h3>
-            <h6 class="font-weight-normal mb-0">Hampir Sempurna, Kelengkapan Sudah Mencapai <span class="text-primary">jj</span>. Ayo Tingkatkan</h6>
+            <h6 class="font-weight-normal mb-0">
+              Hampir Sempurna, Kelengkapan Sudah Mencapai
+              <span class="text-primary">{{ number_format($persentaseKelengkapanKuantitatif, 2) }}%</span>.
+              Ayo Tingkatkan
+            </h6>
           </div>
           <div class="col-12 col-xl-4">
             <div class="justify-content-end d-flex">
@@ -28,7 +32,7 @@
                 <div class="h5 mb-0 text-primary fs-30">{{ $jumlahUser }}</div>
               </div>
               <div class="col-auto">
-                <i class="fas fa-users fa-3x text-reddit"></i>
+                <i class="fas fa-users fa-3x text-success"></i>
               </div>
             </div>
           </div>
@@ -84,7 +88,7 @@
                 </div>
               </div>
               <div class="col-auto">
-                <i class="fas fa-clipboard-list fa-3x text-facebook"></i>
+                <i class="fas fa-clipboard-list fa-3x text-reddit"></i>
               </div>
             </div>
           </div>

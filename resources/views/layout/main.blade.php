@@ -151,7 +151,7 @@
                             <span class="menu-title">Tambah Dokter</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ Request::is('admin/formulirmanagement', 'admin/createformulir', 'admin/createisi/*') ? 'active' : '' }}">
+                    <li class="nav-item {{ Request::is('admin/formulirmanagement', 'admin/createisi/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.formulirmanagement') }}">
                             <i class="fas fa-file menu-icon"></i>
                             <span class="menu-title">Tambah Form</span>
@@ -183,7 +183,7 @@
                                 <li class="nav-item {{ Request::is('admin/laporanmanagement') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('admin.laporanmanagement') }}">
                                         <i class="icon-document menu-icon"></i>
-                                        Keseluruhan
+                                        Pasien
                                     </a>
                                 </li>
                                 <li class="nav-item {{ Request::is('admin/laporankualitatif/*') ? 'active' : '' }}">

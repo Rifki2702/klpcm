@@ -54,7 +54,6 @@ class FormulirController extends Controller
             Formulir::destroy($id);
             DB::commit();
             return redirect()->back()->with('danger', 'Formulir berhasil dihapus');
-
         } catch (Exception $th) {
             DB::rollBack();
             return $th;
@@ -122,5 +121,43 @@ class FormulirController extends Controller
         $isiForm->delete();
 
         return redirect()->back()->with('success', 'Isi Formulir berhasil dihapus');
+    }
+    public function updateformulir(Request $request, $id)
+    {
+        $formulir = Formulir::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'nama_formulir' => 'required|unique:formulir,nama_formulir,' . $formulir->id,
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
+        $formulir->update([
+            'nama_formulir' => $request->nama_formulir,
+        ]);
+
+        return redirect()->route('admin.formulirmanagement')->with('success', 'Formulir berhasil diperbarui');
+    }
+    public function updateisi(Request $request, $id)
+    {
+        $isiForm = IsiForm::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'isi' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
+        $isi = $request->isi;
+
+        $isiForm->update([
+            'isi' => $isi,
+        ]);
+
+        return redirect()->route('admin.createisi', ['id' => $isiForm->formulir_id])->with('success', 'Isi Formulir berhasil diperbarui');
     }
 }
