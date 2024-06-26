@@ -1,0 +1,13 @@
+user akses
+
+Role Admin
+- email : admin@gmail.com
+- password : 12345
+
+Role Rekam Medis
+- email : assembilng@gmail.com
+- password : 12345678
+
+Role Ruangan 
+- email : anturium@gmail.com
+- password : 12345678
