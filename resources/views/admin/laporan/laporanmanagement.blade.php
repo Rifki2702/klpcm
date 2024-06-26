@@ -1,5 +1,6 @@
 @extends('layout.main')
 @push('js')
+<<<<<<< HEAD
 <script>
     $(document).ready(function() {
         $('#filterWaktu').change(function() {
@@ -25,6 +26,38 @@
         });
     });
 </script>
+=======
+    <script>
+        $(document).ready(function() {
+            $('#filterWaktu').change(function() {
+                var id = $(this).val();
+                console.log(id);
+                if (id != '0') {
+                    if (id == 'bulanan') {
+                        $('#bulanField').removeClass('d-none');
+                        $('#customTanggalField').addClass('d-none');
+                        $('#tahunField').addClass('d-none');
+                    }else if(id == 'tahunan') {
+                        $('#bulanField').addClass('d-none');
+                        $('#customTanggalField').addClass('d-none');
+                        $('#tahunField').removeClass('d-none');
+
+                    }else if(id == 'custom') {
+                        $('#bulanField').addClass('d-none');
+                        $('#tahunField').addClass('d-none');
+                        $('#customTanggalField').removeClass('d-none');
+                    }
+                } else {
+                    $('#bulanField').addClass('d-none');
+                    $('#tahunField').addClass('d-none');
+                    $('#customTanggalField').addClass('d-none');
+
+                }
+            })
+
+        })
+    </script>
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
 @endpush
 @section('content')
 <div class="main-panel">
@@ -94,8 +127,17 @@
                                             </select>
                                         </div>
                                     </div>
+<<<<<<< HEAD
                                     <div class="mb-4 text-right">
                                         <button class="btn btn-primary">Filter</button>
+=======
+                                    <div class="mb-4" style="@auth
+                                         display: flex;
+                                         justify-items: end;
+                                    @endauth">
+                                        <button class="btn btn-primary">Filter</button>
+                                        <hr>
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
                                     </div>
                                 </form>
                                 <div class="text-left mb-3">

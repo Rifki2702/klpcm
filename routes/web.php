@@ -30,6 +30,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'as' => 'admin.'], 
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/editprofile/{id}', [DashboardController::class, 'editprofile'])->name('editprofile');
     Route::put('/updateuser/{id}', [DashboardController::class, 'updateuser'])->name('updateuser');
+<<<<<<< HEAD
+=======
+
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
     Route::get('/getchart', [DashboardController::class, 'getchart'])->name('getchart');
 
     Route::get('/usermanagement', [AdminController::class, 'usermanagement'])->name('usermanagement');

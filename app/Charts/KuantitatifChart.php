@@ -32,11 +32,18 @@ class KuantitatifChart
 
         // Looping untuk menghitung persentase kuantitatif
         foreach ($kelengkapan as $kelengkapanItem) {
+<<<<<<< HEAD
             $tanggal = Carbon::parse($kelengkapanItem->created_at)->format('d M Y'); // Mendapatkan tanggal
             $index = array_search($tanggal, $xAxis); // Mencari index tanggal pada xAxis
 
             $kelengkapanHarian = $kelengkapan->filter(function ($item) use ($kelengkapanItem) {
                 return Carbon::parse($item->created_at)->format('d M Y') === Carbon::parse($kelengkapanItem->created_at)->format('d M Y');
+=======
+            $hari = Carbon::parse($kelengkapanItem->tglcek)->dayOfWeek; // Mendapatkan index hari
+
+            $kelengkapanHarian = $kelengkapan->filter(function ($item) use ($kelengkapanItem) {
+                return Carbon::parse($item->tglcek)->dayOfWeek === Carbon::parse($kelengkapanItem->tglcek)->dayOfWeek;
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
             });
 
             // Hitung jumlah kelengkapan harian dan jumlah kelengkapan kuantitatif
@@ -45,8 +52,17 @@ class KuantitatifChart
 
             // Hitung persentase kuantitatif harian
             $persentaseKuantitatif = $jumlahKelengkapanHarian > 0 ? round(($jumlahKuantitatifHarian / $jumlahKelengkapanHarian) * 100, 2) : 0;
+<<<<<<< HEAD
             $dataPersentaseKuantitatif[$index] = $persentaseKuantitatif;
+=======
+            $dataPersentaseKuantitatif[$hari] = $persentaseKuantitatif;
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
         }
+
+        // Mengubah format hari dalam $xAxis dengan deskripsi sesuai yang diminta
+        $xAxis = [
+            'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'
+        ];
 
         // Gunakan objek chart yang sudah disiapkan
         return $this->chart->areaChart()

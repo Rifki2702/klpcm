@@ -77,6 +77,7 @@ class AdminController extends Controller
         return redirect()->route('admin.usermanagement')->with('success', 'Data berhasil ditambahkan.');
     }
 
+<<<<<<< HEAD
     public function show($userId)
     {
         $user = User::findOrFail($userId);
@@ -85,6 +86,8 @@ class AdminController extends Controller
         return view('user.show', compact('user', 'roleName'));
     }
 
+=======
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
     public function edituser(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [

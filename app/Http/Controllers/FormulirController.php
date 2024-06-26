@@ -43,25 +43,11 @@ class FormulirController extends Controller
 
     public function deleteformulir($id)
     {
-        // return $formulir;
-        try {
-            $isi = IsiForm::where('formulir_id', $id)->get();
-            foreach ($isi as $item) {
-                $kelengkapan = Kelengkapan::where('isi_form_id', $item->id)->first();
-                if ($kelengkapan) $kelengkapan->delete();
-            }
-            IsiForm::where('formulir_id', $id)->delete();
-            Formulir::destroy($id);
-            DB::commit();
-            return redirect()->back()->with('danger', 'Formulir berhasil dihapus');
-        } catch (Exception $th) {
-            DB::rollBack();
-            return $th;
-        }
+        $formulir = Formulir::find($id);
 
-        // if (!$formulir) {
-        //     return redirect()->back()->with('error', 'Formulir tidak ditemukan');
-        // }
+        if (!$formulir) {
+            return redirect()->back()->with('error', 'Formulir tidak ditemukan');
+        }
 
         // // Hapus semua isi formulir terlebih dahulu
         // $formulir->isiForms()->delete();

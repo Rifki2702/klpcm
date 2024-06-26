@@ -9,7 +9,10 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+<<<<<<< HEAD
 use Carbon\Carbon;
+=======
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
 
 class LaporanExport implements FromCollection, WithHeadings, WithTitle, ShouldAutoSize, WithStyles
 {
@@ -25,15 +28,24 @@ class LaporanExport implements FromCollection, WithHeadings, WithTitle, ShouldAu
      */
     public function collection()
     {
+<<<<<<< HEAD
         $data = collect();
+=======
+        $data = collect([]);
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
 
         foreach ($this->dataAnalisis as $key => $item) {
             $data->push([
                 'No' => $key + 1,
                 'No RM' => $item['analisis']->pasien->rm,
                 'Nama' => $item['analisis']->pasien->name,
+<<<<<<< HEAD
                 'Tgl Berkas' => Carbon::parse($item['analisis']->tglberkas)->format('d/m/Y'),
                 'Tgl Analisis' => Carbon::parse($item['analisis']->tglcek)->format('d/m/Y'),
+=======
+                'Tgl Berkas' => \Carbon\Carbon::parse($item['analisis']->tglberkas)->format('d/m/Y'),
+                'Tgl Analisis' => \Carbon\Carbon::parse($item['analisis']->tglcek)->format('d/m/Y'),
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
                 'Kuantitatif (%)' => $item['persentase']['kuantitatif'] . '%',
                 'Kualitatif (%)' => $item['persentase']['kualitatif'] . '%',
                 'Dokter' => $item['analisis']->user ? $item['analisis']->user->name : '',
@@ -46,6 +58,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithTitle, ShouldAu
 
     public function headings(): array
     {
+<<<<<<< HEAD
         $currentDateTime = Carbon::now()->format('d/m/Y H:i');
         return [
             ['Laporan KLPCM'], // Add the header text
@@ -61,6 +74,18 @@ class LaporanExport implements FromCollection, WithHeadings, WithTitle, ShouldAu
                 'Dokter',
                 'Status',
             ]
+=======
+        return [
+            'No',
+            'No RM',
+            'Nama',
+            'Tgl Berkas',
+            'Tgl Analisis',
+            'Kuantitatif (%)',
+            'Kualitatif (%)',
+            'Dokter',
+            'Status',
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
         ];
     }
 
@@ -71,6 +96,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithTitle, ShouldAu
 
     public function styles(Worksheet $sheet)
     {
+<<<<<<< HEAD
         $sheet->mergeCells('A1:I1'); // Merge cells for the "Laporan KLPCM" header
         $sheet->mergeCells('A2:I2'); // Merge cells for the download timestamp
 
@@ -88,6 +114,9 @@ class LaporanExport implements FromCollection, WithHeadings, WithTitle, ShouldAu
         ]);
 
         $sheet->getStyle('A3:I3')->applyFromArray([
+=======
+        $sheet->getStyle('A1:I1')->applyFromArray([
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
             'font' => [
                 'bold' => true,
             ],

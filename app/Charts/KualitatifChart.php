@@ -32,11 +32,18 @@ class KualitatifChart
 
         // Looping untuk menghitung persentase kualitatif
         foreach ($ketepatan as $ketepatanItem) {
+<<<<<<< HEAD
             $tanggal = Carbon::parse($ketepatanItem->created_at)->format('d M Y'); // Mendapatkan tanggal
             $index = array_search($tanggal, $xAxis); // Mencari index tanggal pada xAxis
 
             $ketepatanHarian = $ketepatan->filter(function ($item) use ($ketepatanItem) {
                 return Carbon::parse($item->created_at)->format('d M Y') === Carbon::parse($ketepatanItem->created_at)->format('d M Y');
+=======
+            $hari = Carbon::parse($ketepatanItem->created_at)->dayOfWeek; // Mendapatkan index hari
+
+            $ketepatanHarian = $ketepatan->filter(function ($item) use ($ketepatanItem) {
+                return Carbon::parse($item->created_at)->dayOfWeek === Carbon::parse($ketepatanItem->created_at)->dayOfWeek;
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
             });
 
             // Hitung jumlah ketepatan harian dan jumlah ketepatan
@@ -45,8 +52,17 @@ class KualitatifChart
 
             // Hitung persentase kualitatif harian
             $persentaseKualitatif = $jumlahKetepatanHarian > 0 ? round(($jumlahKetepatan / $jumlahKetepatanHarian) * 100, 2) : 0;
+<<<<<<< HEAD
             $dataPersentaseKualitatif[$index] = $persentaseKualitatif;
+=======
+            $dataPersentaseKualitatif[$hari] = $persentaseKualitatif;
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
         }
+
+        // Mengubah format hari dalam $xAxis dengan deskripsi sesuai yang diminta
+        $xAxis = [
+            'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'
+        ];
 
         // Gunakan objek chart yang sudah disiapkan
         return $this->chart->areaChart()

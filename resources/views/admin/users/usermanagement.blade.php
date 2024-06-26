@@ -83,7 +83,11 @@
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
+<<<<<<< HEAD
                                                     <form method="POST" action="{{ route('admin.edituser', ['id' => $d->id]) }}" enctype="multipart/form-data">
+=======
+                                                    <form method="POST" action="{{ route('admin.edituser',['id' => $d->id]) }}" enctype="multipart/form-data">
+>>>>>>> 36eecf08a2c7955fec53765269f7437cf8212087
                                                         @csrf
                                                         @method('PUT')
 
